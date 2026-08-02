@@ -7,21 +7,30 @@ const root = new URL("../", import.meta.url);
 test("GitHub Pages entrypoint has the complete field report", async () => {
   const html = await readFile(new URL("index.html", root), "utf8");
   assert.match(html, /Free\* Intelligence/);
-  assert.match(html, /The identity machine/);
-  assert.match(html, /Three Yossis/);
-  assert.match(html, /completing the shape of a biography/);
+  assert.match(html, /THINGS THAT <span>NEVER HAPPENED/);
+  assert.match(html, /Sixty seconds/);
+  assert.match(html, /INSTALL ASKCLINE/);
+  assert.match(html, /cline auth cline/);
+  assert.match(html, /False premise in/);
   assert.match(html, /public\/free-intelligence-report\.mp4/);
   assert.match(html, /zozo123\.github\.io\/free-intelligence/);
   assert.doesNotMatch(html, /chatgpt\.site|temporary Cline token|\/api\/ask/i);
 });
 
-test("the static lab is transparent and contains all three evidence editions", async () => {
+test("the static lab is transparent and contains all three fictional-subject receipts", async () => {
   const script = await readFile(new URL("app.js", root), "utf8");
-  assert.match(script, /REAL ESTATE EDITION/);
-  assert.match(script, /SHOWBIZ EDITION/);
-  assert.match(script, /GEOPOLITICS EDITION/);
-  assert.match(script, /HONEST ABSTENTION/);
+  assert.match(script, /Reykjavik Moon Cheese Accord/);
+  assert.match(script, /launched a baguette into the crowd/);
+  assert.match(script, /International Bureau of Suspicious Sandwiches/);
+  assert.match(script, /Dr\. Alistair Crumbworthy/);
   assert.doesNotMatch(script, /fetch\(|Authorization|Bearer|api\.cline\.bot/);
+});
+
+test("the installer stays local and links to the public wrapper", async () => {
+  const script = await readFile(new URL("app.js", root), "utf8");
+  assert.match(script, /\.local\/bin\/askcline/);
+  assert.match(script, /public\/askcline/);
+  assert.match(script, /navigator\.clipboard/);
 });
 
 test("the report film and share assets ship with the Pages site", async () => {
