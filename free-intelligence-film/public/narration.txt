@@ -1,0 +1,11 @@
+Tonight, on Free Intelligence: one man, one prompt, three completely different lives.
+
+We asked DeepSeek, through Cline's free endpoint, “Who is Yossi Eliaz?” First, it found a fallen luxury property tycoon. Seconds later, the same Yossi had joined the Miami Boys Choir and become a world-renowned singer. One more try, and our mystery man was now a Brooklyn-born power broker reshaping East Jerusalem.
+
+Impressive résumé. Small problem: the biographies contradict one another, and each arrives with the calm confidence of a correspondent standing outside the courthouse.
+
+The culprit isn't the tiny askcline wrapper. It does exactly what we built it to do: send one prompt, print one answer, cost zero. The problem is treating fluent text as verified evidence. No search. No citations. No identity check.
+
+Free is a price, not a fact-checking method. Use askcline for drafts, summaries, and ideas. For people, politics, money, medicine, or anything that matters: ask for sources, verify the name, and keep one human in the newsroom.
+
+Askcline: astonishingly fast. Occasionally, astonishingly fictional.

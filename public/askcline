@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# askcline — one-line queries against Cline's free-tier models.
+set -euo pipefail
+
+CONFIG="$HOME/.cline/data/settings/providers.json"
+MODEL="${CLINE_MODEL:-~deepseek/deepseek-v4-flash-latest}"
+
+if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  printf '%s\n' 'Usage: askcline <question>' 'Set CLINE_MODEL to choose another free model.'
+  exit 0
+fi
+
+if [ ! -f "$CONFIG" ]; then
+  echo "askcline: authenticate first with: cline auth cline" >&2
+  exit 1
+fi
+
+PROMPT="$*"
+get_token() {
+  python3 -c "import json; print(json.load(open('$CONFIG'))['providers']['cline']['settings']['auth']['accessToken'])"
+}
+
+query() {
+  curl -sS -X POST "https://api.cline.bot/api/v1/chat/completions" \
+    -H "Authorization: Bearer $1" \
+    -H "Content-Type: application/json" \
+    -d "$(jq -n --arg model "$MODEL" --arg content "$PROMPT" '{model: $model, messages: [{role: "user", content: $content}], stream: false}')"
+}
+
+RESPONSE=$(query "$(get_token)")
+if ! echo "$RESPONSE" | jq -e '.success' >/dev/null 2>&1; then
+  cline --auto-approve true -t 15 "reply with just: ok" >/dev/null 2>&1 || true
+  RESPONSE=$(query "$(get_token)")
+fi
+
+if [ -n "${ASKCLINE_VERBOSE:-}" ]; then
+  echo "$RESPONSE" | jq -r '"[\(.data.model // "?") via \(.data.provider // "?") | cost: $\(.data.usage.cost // 0)]"' >&2
+fi
+
+echo "$RESPONSE" | jq -r '.data.choices[0].message.content // ("askcline error: " + (.error.message // tostring))'
