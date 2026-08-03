@@ -1,96 +1,117 @@
 # Free* Intelligence
 
-**The same model behaves very differently with and without a harness.**
+**`askcline "task"` is now one command for Cline's full end-to-end agent harness.**
 
-This repository is both a static field report about confident false-premise completion and a small, testable CLI that makes the execution boundary explicit:
+The original field report showed what happens when a raw model endpoint receives a leading false premise: it can return fluent, unsupported history. Version 1.0 keeps that raw path explicit, but makes the harness the product:
 
 ```text
-raw prompt  -> Cline Chat Completions API -> text
-agent task  -> Cline CLI harness -> tools -> observations -> iterations -> result
-verify fact -> Cline CLI harness + evidence/abstention contract -> supported answer or refusal
+askcline "task"
+  -> inspect workspace
+  -> use Cline tools
+  -> edit and execute
+  -> run tests/build
+  -> diagnose and retry
+  -> review the diff
+  -> report the finished result
 ```
 
-A model endpoint is not an agent, retrieval system, verifier, or evaluation harness.
+A model call produces text. A harness turns the model into an agent.
 
 ## Install
 
-Install and authenticate the official Cline CLI for `agent`, `verify`, and `doctor` modes. Create a Cline API key for `raw` mode.
+Install and authenticate the official Cline CLI, then install the transparent wrapper:
 
 ```bash
+cline auth
 mkdir -p "$HOME/.local/bin"
 curl -fsSL https://zozo123.github.io/free-intelligence/public/askcline -o "$HOME/.local/bin/askcline"
 chmod +x "$HOME/.local/bin/askcline"
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-## Use
+## One command
 
-Raw completion for clean shell pipelines:
+Run it from the repository you want Cline to own end-to-end:
 
 ```bash
+cd my-repository
+askcline "inspect the repo, implement the issue, run every relevant check, fix failures, and leave it ready to merge"
+```
+
+A plain task is the autonomous agent mode. It defaults to:
+
+- the current workspace;
+- Act mode with tool auto-approval enabled;
+- high reasoning effort;
+- five consecutive-mistake retries;
+- no artificial task timeout;
+- an explicit inspect -> implement -> validate -> retry -> review -> summarize loop;
+- a small deny policy for catastrophic host and force-push commands.
+
+The wrapper does not force a model. It uses the model and provider configured in Cline unless `CLINE_MODEL` or `CLINE_PROVIDER` is supplied.
+
+## Other modes
+
+```bash
+# Open Cline interactively in the current directory
+askcline
+
+# Same full agent path, written explicitly
+askcline agent "fix the tests and finish"
+
+# Investigate without autonomous edits
+askcline plan "design the migration"
+
+# Evidence-oriented research and abstention
+askcline verify "Did this event actually happen?"
+
+# The old one-shot completion path, now explicit
 export CLINE_API_KEY="..."
 askcline raw "Summarize this:" "$(cat notes.txt)"
-```
 
-Full Cline coding-agent harness:
-
-```bash
-askcline agent "Inspect this repository, run the tests, fix failures, and explain the diff"
-```
-
-Agent mode defaults to `--auto-approve false`. Enable approval only inside a controlled workspace.
-
-Evidence-oriented verification:
-
-```bash
-askcline verify "Who signed the Reykjavik Moon Cheese Accord?"
-```
-
-Verification mode asks Cline to disambiguate entities, retrieve evidence, cite what it inspected, separate inference, and abstain when evidence is insufficient. It also installs a restrictive command policy and tells the agent not to modify files.
-
-Check the setup:
-
-```bash
+# Validate the installation
 askcline doctor
 ```
 
-## What changed in v0.2
+Set `ASKCLINE_JSON=true` for Cline NDJSON events. Set `ASKCLINE_AUTO_APPROVE=false` for approval-gated runs. Set `ASKCLINE_UNRESTRICTED=true` only when you intentionally want to bypass the wrapper's catastrophic-command deny policy.
 
-- `raw`: supported `CLINE_API_KEY` authentication, current OpenAI-compatible response parsing, migration compatibility, retry handling, clean stdout/stderr, and nonzero failures.
-- `agent`: delegates to the official Cline CLI harness with JSON traces, workspace context, timeout, model selection, and safe approval defaults.
-- `verify`: uses the harness with an evidence and abstention contract plus restrictive command permissions.
-- `doctor`: checks local dependencies and configuration.
-- Deterministic tests cover API parsing, failures, private-token avoidance, and harness delegation.
-- Cross-platform GitHub Actions run the static tests, wrapper tests, Bash validation, and ShellCheck.
-- `.cline/rules/harness.md` preserves the architecture when Cline works on its own repository.
-- `evals/cases.jsonl` seeds repeated evaluations for false premises, ambiguous identity, transformations, and repository repair.
+## Why the default changed
 
-## Evaluation
+The raw endpoint cannot inspect a repository, run a command, observe a failure, edit a file, or continue a tool loop. Cline CLI can. The default command therefore delegates authentication, sessions, tools, rules, hooks, context management, and execution to Cline instead of reimplementing those pieces in Bash.
+
+`raw` remains valuable for low-stakes transformations and clean shell pipelines. It is not the default because it is not agentic.
+
+## Safety boundary
+
+Autonomous execution is powerful. Use a clean branch and a workspace you are prepared to modify. The wrapper blocks a small set of catastrophic commands by default, but it does not sandbox the process or make generated changes correct. Review the diff before publishing.
+
+The wrapper never reads Cline's private token files. Agent runs let the official CLI manage its authentication. Raw API calls require an explicit `CLINE_API_KEY`. The static GitHub Pages site never accepts credentials.
+
+## Validation
 
 ```bash
 npm test
+bash -n public/askcline
 ```
 
-The tests verify:
+The deterministic suite covers:
 
-- current and legacy API response parsing;
-- errors never becoming successful stdout answers;
-- explicit API-key usage rather than private Cline token scraping;
-- safe delegation to the full Cline harness;
-- Bash syntax and the static GitHub Pages exhibit.
+- the autonomous default dispatch;
+- full Cline CLI flags and finish-line task contract;
+- approval and JSON overrides;
+- interactive mode;
+- current and legacy raw API responses;
+- HTTP failures and nonzero exits;
+- clean stdout for raw pipelines;
+- absence of private-token scraping.
 
-## Boundaries
+GitHub Actions run the suite on Ubuntu and macOS and run ShellCheck on Linux.
 
-- `raw` does not browse, execute tools, inspect a repository, verify claims, or continue a tool loop.
-- `agent` can execute tools; keep approval disabled unless the workspace is isolated and the task is understood.
-- `verify` improves process but cannot guarantee that a source is correct or complete.
-- The static GitHub Pages site never accepts credentials.
-- Fluent output is not evidence by itself.
+## Field report
 
-## Development
+The root GitHub Pages site preserves the original three fictional-premise captures and the 60-second Remotion report. Those receipts demonstrate the explicit `askcline raw` path, not the new agentic default.
 
 ```bash
-npm test
 python3 -m http.server 8000
 ```
 
@@ -103,4 +124,4 @@ npm run dev
 npx remotion render FreeIntelligenceReport out/free-intelligence-report.mp4
 ```
 
-Free describes the price. The harness determines much of the behavior. Neither replaces verification.
+Free describes the price. The harness determines the behavior. Validation determines whether the result is ready.
