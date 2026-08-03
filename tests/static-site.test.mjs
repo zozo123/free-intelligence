@@ -4,14 +4,18 @@ import test from "node:test";
 
 const root = new URL("../", import.meta.url);
 
-test("GitHub Pages entrypoint has the complete field report", async () => {
+test("GitHub Pages entrypoint has the complete and accurate field report", async () => {
   const html = await readFile(new URL("index.html", root), "utf8");
   assert.match(html, /Free\* Intelligence/);
   assert.match(html, /THINGS THAT <span>NEVER HAPPENED/);
   assert.match(html, /Sixty seconds/);
   assert.match(html, /INSTALL ASKCLINE/);
-  assert.match(html, /cline auth cline/);
+  assert.match(html, /cline auth<\/code>/);
   assert.match(html, /False premise in/);
+  assert.match(html, /READ-ONLY MODES ARE ENFORCED/);
+  assert.match(html, /AUTONOMY WARNING/);
+  assert.match(html, /not a sandbox/i);
+  assert.match(html, /human review/i);
   assert.match(html, /public\/free-intelligence-report\.mp4/);
   assert.match(html, /zozo123\.github\.io\/free-intelligence/);
   assert.doesNotMatch(html, /chatgpt\.site|temporary Cline token|\/api\/ask/i);
