@@ -1,7 +1,7 @@
 {
   "name": "free-intelligence-film",
   "version": "1.0.0",
-  "description": "My Remotion video",
+  "description": "A 70-second Remotion field report about the difference between model answers and accountable agent harnesses.",
   "repository": {},
   "license": "UNLICENSED",
   "private": true,
@@ -26,7 +26,11 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "render:film": "remotion render src/index.ts FreeIntelligenceReport ../public/free-intelligence-report.mp4 --codec=h264 --crf=20",
+    "render:poster": "remotion still src/index.ts FreeIntelligencePoster ../public/film-poster.png",
+    "render:og": "remotion still src/index.ts FreeIntelligenceOg ../public/og.png",
+    "render:all": "npm run render:film && npm run render:poster && npm run render:og"
   },
   "sideEffects": [
     "*.css"
