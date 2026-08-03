@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {mkdtemp, readFile, writeFile, chmod} from "node:fs/promises";
+import {chmod, mkdtemp, readFile, writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join, resolve} from "node:path";
 import {spawnSync} from "node:child_process";
@@ -15,10 +15,18 @@ async function fakePath(response, status = "200") {
   return `${dir}:${process.env.PATH}`;
 }
 
+async function fakeCline() {
+  const dir = await mkdtemp(join(tmpdir(), "askcline-cline-"));
+  const cline = join(dir, "cline");
+  await writeFile(cline, '#!/usr/bin/env bash\nif [ "${1:-}" = "--version" ]; then echo "1.0.0-test"; exit 0; fi\nprintf "%s\\n" "$*"\n');
+  await chmod(cline, 0o755);
+  return `${dir}:${process.env.PATH}`;
+}
+
 function run(args, env = {}) {
   return spawnSync("bash", [script, ...args], {
     encoding: "utf8",
-    env: {...process.env, CLINE_API_KEY: "test-key", CLINE_MODEL: "test/model", ...env},
+    env: {...process.env, CLINE_API_KEY: "test-key", CLINE_RAW_MODEL: "test/model", ...env},
   });
 }
 
@@ -56,20 +64,38 @@ test("raw mode requires an explicit API key", () => {
   assert.match(result.stderr, /CLINE_API_KEY is required/);
 });
 
-test("agent mode delegates to Cline's harness with safe defaults", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "askcline-cline-"));
-  const cline = join(dir, "cline");
-  await writeFile(cline, '#!/usr/bin/env bash\nprintf "%s\\n" "$*"\n');
-  await chmod(cline, 0o755);
-  const result = run(["agent", "inspect", "repo"], {PATH: `${dir}:${process.env.PATH}`});
+test("a plain task invokes the full autonomous Cline harness", async () => {
+  const PATH = await fakeCline();
+  const result = run(["inspect", "repo"], {PATH, CLINE_MODEL: "", CLINE_PROVIDER: ""});
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /--json/);
-  assert.match(result.stdout, /--auto-approve false/);
-  assert.match(result.stdout, /inspect repo/);
+  assert.match(result.stdout, /--cwd/);
+  assert.match(result.stdout, /--auto-approve true/);
+  assert.match(result.stdout, /--thinking high/);
+  assert.match(result.stdout, /--retries 5/);
+  assert.doesNotMatch(result.stdout, /--json/);
+  assert.match(result.stdout, /Run the relevant formatter, linter, type checker, tests, and build/);
+  assert.match(result.stdout, /USER TASK:\ninspect repo/);
 });
 
-test("repository script does not read private Cline token storage", async () => {
+test("agent alias and safety override are honored", async () => {
+  const PATH = await fakeCline();
+  const result = run(["agent", "fix", "it"], {PATH, ASKCLINE_AUTO_APPROVE: "false", ASKCLINE_JSON: "true"});
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /--auto-approve false/);
+  assert.match(result.stdout, /--json/);
+  assert.match(result.stdout, /USER TASK:\nfix it/);
+});
+
+test("no arguments opens the interactive harness in the current workspace", async () => {
+  const PATH = await fakeCline();
+  const result = run([], {PATH});
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /--cwd/);
+});
+
+test("repository script never reads private Cline token storage", async () => {
   const source = await readFile(script, "utf8");
   assert.doesNotMatch(source, /providers\.json|accessToken/);
   assert.match(source, /CLINE_API_KEY/);
+  assert.match(source, /\*\) agent_mode/);
 });
