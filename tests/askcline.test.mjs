@@ -47,29 +47,33 @@ test("agent alias and JSON safety override are honored", async () => {
   assert.match(result.stdout, /--json/);
 });
 
-test("plan and verify are Cline harness modes", async () => {
+test("plan and verify use Cline Plan mode", async () => {
   const PATH = await fakeCline();
   const plan = run(["plan", "design", "it"], {PATH});
   const verify = run(["verify", "did", "it", "happen"], {PATH});
   assert.equal(plan.status, 0, plan.stderr);
   assert.match(plan.stdout, /--plan/);
   assert.equal(verify.status, 0, verify.stderr);
-  assert.match(verify.stdout, /Operate in verification mode/);
+  assert.match(verify.stdout, /--plan/);
+  assert.match(verify.stdout, /--auto-approve false/);
+  assert.match(verify.stdout, /read-only verification mode/);
 });
 
-test("legacy raw command is routed through Cline rather than HTTP", async () => {
+test("legacy raw command is routed through read-only Cline Plan mode", async () => {
   const PATH = await fakeCline();
   const result = run(["raw", "capital?"], {PATH});
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stderr, /raw is deprecated/);
-  assert.match(result.stdout, /Answer the user directly through the Cline harness/);
+  assert.match(result.stdout, /--plan/);
+  assert.match(result.stdout, /Cline harness in read-only Plan mode/);
 });
 
-test("text mode is harness-backed and read-only by contract", async () => {
+test("text mode is harness-backed and enforced read-only", async () => {
   const PATH = await fakeCline();
   const result = run(["text", "summarize", "this"], {PATH});
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /--auto-approve false/);
+  assert.match(result.stdout, /--plan/);
   assert.match(result.stdout, /Do not modify repository files/);
 });
 
@@ -93,4 +97,5 @@ test("there is no direct Cline HTTP client or private-token access", async () =>
   assert.doesNotMatch(source, /\bcurl\b|\bjq\b/);
   assert.match(source, /raw\).*text_mode/);
   assert.match(source, /\*\) agent_mode/);
+  assert.match(source, /git push --force-with-lease/);
 });
