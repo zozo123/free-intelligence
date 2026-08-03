@@ -7,18 +7,10 @@ import test from "node:test";
 
 const script = resolve("public/askcline");
 
-async function fakePath(response, status = "200") {
-  const dir = await mkdtemp(join(tmpdir(), "askcline-test-"));
-  const curl = join(dir, "curl");
-  await writeFile(curl, `#!/usr/bin/env bash\nset -euo pipefail\nout=''\nwhile [ $# -gt 0 ]; do\n  case "$1" in\n    --output) out="$2"; shift 2 ;;\n    --write-out) shift 2 ;;\n    *) shift ;;\n  esac\ndone\ncat > "$out" <<'JSON'\n${JSON.stringify(response)}\nJSON\nprintf '${status}'\n`);
-  await chmod(curl, 0o755);
-  return `${dir}:${process.env.PATH}`;
-}
-
 async function fakeCline() {
   const dir = await mkdtemp(join(tmpdir(), "askcline-cline-"));
   const cline = join(dir, "cline");
-  await writeFile(cline, '#!/usr/bin/env bash\nif [ "${1:-}" = "--version" ]; then echo "1.0.0-test"; exit 0; fi\nprintf "%s\\n" "$*"\n');
+  await writeFile(cline, '#!/usr/bin/env bash\nprintf "%s\\n" "$*"\n');
   await chmod(cline, 0o755);
   return `${dir}:${process.env.PATH}`;
 }
@@ -26,7 +18,7 @@ async function fakeCline() {
 function run(args, env = {}) {
   return spawnSync("bash", [script, ...args], {
     encoding: "utf8",
-    env: {...process.env, CLINE_API_KEY: "test-key", CLINE_RAW_MODEL: "test/model", ...env},
+    env: {...process.env, CLINE_MODEL: "", CLINE_PROVIDER: "", ...env},
   });
 }
 
@@ -35,67 +27,70 @@ test("script parses as valid bash", () => {
   assert.equal(result.status, 0, result.stderr);
 });
 
-test("raw mode prints only a top-level OpenAI-compatible answer", async () => {
-  const PATH = await fakePath({model: "test/model", choices: [{message: {content: "Paris"}}], usage: {prompt_tokens: 3, completion_tokens: 1, cost: 0}});
-  const result = run(["raw", "capital?"], {PATH});
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout, "Paris\n");
-  assert.equal(result.stderr, "");
-});
-
-test("legacy wrapped responses remain readable during migration", async () => {
-  const PATH = await fakePath({data: {choices: [{message: {content: "legacy"}}]}});
-  const result = run(["raw", "question"], {PATH});
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout, "legacy\n");
-});
-
-test("HTTP failures are nonzero and never become stdout answers", async () => {
-  const PATH = await fakePath({error: {message: "bad key"}}, "401");
-  const result = run(["raw", "question"], {PATH});
-  assert.notEqual(result.status, 0);
-  assert.equal(result.stdout, "");
-  assert.match(result.stderr, /HTTP 401\).*: bad key/);
-});
-
-test("raw mode requires an explicit API key", () => {
-  const result = run(["raw", "question"], {CLINE_API_KEY: ""});
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /CLINE_API_KEY is required/);
-});
-
 test("a plain task invokes the full autonomous Cline harness", async () => {
   const PATH = await fakeCline();
-  const result = run(["inspect", "repo"], {PATH, CLINE_MODEL: "", CLINE_PROVIDER: ""});
+  const result = run(["inspect", "repo"], {PATH});
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /--cwd/);
   assert.match(result.stdout, /--auto-approve true/);
   assert.match(result.stdout, /--thinking high/);
   assert.match(result.stdout, /--retries 5/);
-  assert.doesNotMatch(result.stdout, /--json/);
   assert.match(result.stdout, /Run the relevant formatter, linter, type checker, tests, and build/);
   assert.match(result.stdout, /USER TASK:\ninspect repo/);
 });
 
-test("agent alias and safety override are honored", async () => {
+test("agent alias and JSON safety override are honored", async () => {
   const PATH = await fakeCline();
   const result = run(["agent", "fix", "it"], {PATH, ASKCLINE_AUTO_APPROVE: "false", ASKCLINE_JSON: "true"});
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /--auto-approve false/);
   assert.match(result.stdout, /--json/);
-  assert.match(result.stdout, /USER TASK:\nfix it/);
 });
 
-test("no arguments opens the interactive harness in the current workspace", async () => {
+test("plan and verify are Cline harness modes", async () => {
+  const PATH = await fakeCline();
+  const plan = run(["plan", "design", "it"], {PATH});
+  const verify = run(["verify", "did", "it", "happen"], {PATH});
+  assert.equal(plan.status, 0, plan.stderr);
+  assert.match(plan.stdout, /--plan/);
+  assert.equal(verify.status, 0, verify.stderr);
+  assert.match(verify.stdout, /Operate in verification mode/);
+});
+
+test("legacy raw command is routed through Cline rather than HTTP", async () => {
+  const PATH = await fakeCline();
+  const result = run(["raw", "capital?"], {PATH});
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stderr, /raw is deprecated/);
+  assert.match(result.stdout, /Answer the user directly through the Cline harness/);
+});
+
+test("text mode is harness-backed and read-only by contract", async () => {
+  const PATH = await fakeCline();
+  const result = run(["text", "summarize", "this"], {PATH});
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /--auto-approve false/);
+  assert.match(result.stdout, /Do not modify repository files/);
+});
+
+test("no arguments opens interactive Cline in the current workspace", async () => {
   const PATH = await fakeCline();
   const result = run([], {PATH});
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /--cwd/);
 });
 
-test("repository script never reads private Cline token storage", async () => {
+test("doctor delegates to the official Cline doctor", async () => {
+  const PATH = await fakeCline();
+  const result = run(["doctor"], {PATH});
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.trim(), "doctor");
+});
+
+test("there is no direct Cline HTTP client or private-token access", async () => {
   const source = await readFile(script, "utf8");
-  assert.doesNotMatch(source, /providers\.json|accessToken/);
-  assert.match(source, /CLINE_API_KEY/);
+  assert.doesNotMatch(source, /api\.cline\.bot|CLINE_API_KEY|providers\.json|accessToken/);
+  assert.doesNotMatch(source, /\bcurl\b|\bjq\b/);
+  assert.match(source, /raw\).*text_mode/);
   assert.match(source, /\*\) agent_mode/);
 });
