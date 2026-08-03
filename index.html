@@ -7,7 +7,7 @@
     <meta name="description" content="The field report behind askcline: historical raw-model receipts and a current CLI that routes every task through Cline's full agent harness." />
     <link rel="canonical" href="https://zozo123.github.io/free-intelligence/" />
     <meta property="og:title" content="Free* Intelligence — askcline harness only" />
-    <meta property="og:description" content="One command. The official Cline CLI. Tools, retries, validation, and no direct model endpoint." />
+    <meta property="og:description" content="One command. The official Cline CLI. Tools, retries, validation requests, and no direct model endpoint." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zozo123.github.io/free-intelligence/" />
     <meta property="og:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
@@ -19,7 +19,7 @@
     <a class="skip-link" href="#main">Skip to report</a>
     <nav class="masthead" aria-label="Primary navigation">
       <a class="wordmark" href="#top">ASKCLINE<span>*</span></a>
-      <div class="nav-center">FREE INTELLIGENCE / HARNESS-ONLY 1.1</div>
+      <div class="nav-center">FREE INTELLIGENCE / HARNESS-ONLY 1.1.1</div>
       <div class="nav-links">
         <a href="#harness">HARNESS</a>
         <a href="#receipts">RECEIPTS</a>
@@ -41,10 +41,10 @@
         <div class="hero-evidence" aria-label="Harness execution loop">
           <article class="hero-clipping clipping-one"><span>01 / INSPECT</span><strong>READ THE REPO<br />AND ITS RULES</strong><em>Context before code.</em></article>
           <article class="hero-clipping clipping-two"><span>02 / EXECUTE</span><strong>TOOLS, EDITS,<br />COMMANDS, RETRIES</strong><em>Observations feed the loop.</em></article>
-          <article class="hero-clipping clipping-three"><span>03 / VERIFY</span><strong>TEST, REVIEW,<br />REPORT HONESTLY</strong><em>No unrun checks claimed.</em></article>
+          <article class="hero-clipping clipping-three"><span>03 / VERIFY</span><strong>TEST, REVIEW,<br />REPORT EVIDENCE</strong><em>Checks must be named, not implied.</em></article>
           <div class="confidence-stamp">CLINE<br />HARNESS</div>
         </div>
-        <p class="asterisk-note"><span>*</span> The wrapper adds a finish-line contract. Cline supplies the actual agent runtime.</p>
+        <p class="asterisk-note"><span>*</span> The wrapper requests a finish-line loop. The resulting diff and reported checks still require human review.</p>
       </section>
 
       <div class="ticker" aria-label="Architecture summary">
@@ -54,14 +54,14 @@
       <section class="mechanism" id="harness">
         <div class="mechanism-title">
           <p class="eyebrow">THE CURRENT PRODUCT</p>
-          <h2>One command to take a repository to the finish line.</h2>
+          <h2>One command to drive a repository toward the finish line.</h2>
           <p>A plain task starts Cline in the current workspace, uses Act mode, applies high reasoning and retry settings, preserves project rules, and asks the agent to inspect, implement, validate, retry, review, and summarize.</p>
         </div>
         <div class="pipeline" role="list" aria-label="How askcline works">
           <div role="listitem"><b>01</b><strong>YOUR TASK</strong><span>Natural language from the current repository.</span></div><i aria-hidden="true">→</i>
           <div role="listitem"><b>02</b><strong>CLINE CLI</strong><span>Official auth, sessions, context, and agent loop.</span></div><i aria-hidden="true">→</i>
           <div role="listitem"><b>03</b><strong>TOOLS</strong><span>Files, terminal, browser, rules, and observations.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>04</b><strong>VALIDATED RESULT</strong><span>Checks run, failures retried, diff reviewed.</span></div>
+          <div role="listitem"><b>04</b><strong>VALIDATION EVIDENCE</strong><span>Checks requested, failures retried, final diff and results reported.</span></div>
         </div>
         <div class="terminal-card compact-terminal">
           <div class="terminal-top"><span>my-repository</span><span>zsh</span></div>
@@ -73,6 +73,7 @@
 
 <span class="prompt">$</span> askcline text "summarize this document"</code></pre>
         </div>
+        <p class="evidence-mode"><strong>READ-ONLY MODES ARE ENFORCED</strong> <code>plan</code>, <code>verify</code>, <code>text</code>, and the deprecated <code>raw</code> alias run through Cline Plan mode. Autonomous edits are reserved for the default agent path.</p>
       </section>
 
       <section class="film-section" id="film">
@@ -119,12 +120,17 @@
         </div>
         <div class="install-body">
           <ol class="install-steps">
-            <li><b>1</b><div><strong>Authenticate the official CLI</strong><code>cline auth cline</code></div></li>
+            <li><b>1</b><div><strong>Authenticate the official CLI</strong><code>cline auth</code></div></li>
             <li><b>2</b><div><strong>Install the wrapper</strong><div class="install-command"><code id="install-command">Preparing GitHub Pages URL…</code><button type="button" id="copy-install">COPY</button></div></div></li>
             <li><b>3</b><div><strong>Add it to PATH</strong><code>export PATH="$HOME/.local/bin:$PATH"</code></div></li>
             <li><b>4</b><div><strong>Finish a task</strong><code>askcline "inspect, implement, validate, retry, and finish"</code></div></li>
           </ol>
-          <aside class="requirements"><p class="micro-label">REQUIRES</p><ul><li>Cline CLI</li><li>An authenticated provider</li><li>A repository workspace</li></ul><a class="button primary download-button" href="./public/askcline" download>Download the script</a></aside>
+          <aside class="requirements">
+            <p class="micro-label">REQUIRES</p>
+            <ul><li>Cline CLI</li><li>An authenticated provider</li><li>A repository workspace</li></ul>
+            <a class="button primary download-button" href="./public/askcline" download>Download the script</a>
+            <p class="evidence-mode"><strong>AUTONOMY WARNING</strong> The default task mode uses <code>--auto-approve true</code>. It can edit files and run commands. This wrapper is not a sandbox: use a clean branch, review the diff, or set <code>ASKCLINE_AUTO_APPROVE=false</code>.</p>
+          </aside>
         </div>
       </section>
 
@@ -132,13 +138,13 @@
         <header class="section-heading dark-heading">
           <p class="eyebrow light">THE LESSON</p>
           <h2>False premise in.<br />Polished “fact” out.</h2>
-          <p>A completion endpoint can return text and tool-call requests. The harness is what executes tools, observes results, continues the loop, applies permissions, and validates the outcome.</p>
+          <p>A completion endpoint can return text and tool-call requests. The harness is what executes tools, observes results, continues the loop, applies permissions, and requests validation evidence.</p>
         </header>
         <div class="diagnosis-grid">
           <article><span>01</span><h3>Workspace context</h3><p>Cline reads the repository, instructions, rules, and relevant files before changing code.</p></article>
           <article><span>02</span><h3>Observation loop</h3><p>Commands and tools produce results that become the next step's evidence.</p></article>
           <article><span>03</span><h3>Permissions</h3><p>Auto-approval and command policies control autonomous execution.</p></article>
-          <article><span>04</span><h3>Validation</h3><p>The task contract requires real checks and honest reporting instead of fluent completion theater.</p></article>
+          <article><span>04</span><h3>Validation</h3><p>The task contract requires named checks and honest reporting; humans still review the evidence and final diff.</p></article>
         </div>
       </section>
     </main>
