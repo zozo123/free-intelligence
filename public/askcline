@@ -1,40 +1,120 @@
 #!/usr/bin/env bash
-# askcline — one-line queries against Cline's free-tier models.
 set -euo pipefail
 
-CONFIG="$HOME/.cline/data/settings/providers.json"
-MODEL="${CLINE_MODEL:-~deepseek/deepseek-v4-flash-latest}"
+VERSION="0.2.0"
+API_URL="${CLINE_API_URL:-https://api.cline.bot/api/v1/chat/completions}"
+MODEL="${CLINE_MODEL:-minimax/minimax-m2.5}"
+TIMEOUT="${CLINE_TIMEOUT:-120}"
 
-if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  printf '%s\n' 'Usage: askcline <question>' 'Set CLINE_MODEL to choose another free model.'
-  exit 0
-fi
+usage() {
+  cat <<'USAGE'
+askcline 0.2.0 - raw model calls and the full Cline agent harness
 
-if [ ! -f "$CONFIG" ]; then
-  echo "askcline: authenticate first with: cline auth cline" >&2
-  exit 1
-fi
+Usage:
+  askcline [raw] <prompt...>       One stateless API completion; answer to stdout
+  askcline agent <task...>        Run the full Cline coding-agent harness in this repo
+  askcline verify <question...>    Run Cline with a verification/abstention contract
+  askcline doctor                  Check dependencies and Cline configuration
+  askcline --version
 
-PROMPT="$*"
-get_token() {
-  python3 -c "import json; print(json.load(open('$CONFIG'))['providers']['cline']['settings']['auth']['accessToken'])"
+Environment:
+  CLINE_API_KEY          Required for raw mode
+  CLINE_MODEL            Model ID (default: minimax/minimax-m2.5)
+  CLINE_API_URL          Override API endpoint
+  CLINE_TIMEOUT          Seconds (default: 120)
+  ASKCLINE_AUTO_APPROVE  true/false for agent mode (default: false)
+  ASKCLINE_VERBOSE       Print model/usage metadata to stderr
+USAGE
 }
 
-query() {
-  curl -sS -X POST "https://api.cline.bot/api/v1/chat/completions" \
-    -H "Authorization: Bearer $1" \
-    -H "Content-Type: application/json" \
-    -d "$(jq -n --arg model "$MODEL" --arg content "$PROMPT" '{model: $model, messages: [{role: "user", content: $content}], stream: false}')"
+fail() { printf 'askcline: %s\n' "$*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || fail "missing dependency: $1"; }
+
+raw_mode() {
+  need curl
+  need jq
+  [ -n "${CLINE_API_KEY:-}" ] || fail "CLINE_API_KEY is required for raw mode; create an API key instead of reading Cline's private session files"
+  [ "$#" -gt 0 ] || fail "raw mode requires a prompt"
+
+  local prompt body status attempt delay payload
+  prompt="$*"
+  body="$(mktemp)"
+  payload="$(jq -n --arg model "$MODEL" --arg content "$prompt" '{model:$model,messages:[{role:"user",content:$content}],stream:false}')"
+  trap 'rm -f "$body"' RETURN
+  attempt=1
+  delay=1
+
+  while :; do
+    status="$(curl --silent --show-error --location \
+      --connect-timeout 15 --max-time "$TIMEOUT" \
+      --output "$body" --write-out '%{http_code}' \
+      --request POST "$API_URL" \
+      --header "Authorization: Bearer $CLINE_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --header 'X-Title: free-intelligence/askcline' \
+      --data "$payload" || true)"
+
+    if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then break; fi
+    if [[ "$status" =~ ^(429|500|502|503|504)$ ]] && [ "$attempt" -lt 3 ]; then
+      sleep "$delay"
+      attempt=$((attempt + 1))
+      delay=$((delay * 2))
+      continue
+    fi
+    local message
+    message="$(jq -r '.error.message // .message // empty' "$body" 2>/dev/null || true)"
+    fail "API request failed (HTTP ${status:-000})${message:+: $message}"
+  done
+
+  local answer
+  answer="$(jq -er '.choices[0].message.content // .data.choices[0].message.content // error("response contained no answer")' "$body" 2>/dev/null)" \
+    || fail "invalid API response: $(tr '\n' ' ' < "$body" | cut -c1-300)"
+
+  if [ -n "${ASKCLINE_VERBOSE:-}" ]; then
+    jq -r '"[model=\(.model // .data.model // "?") prompt_tokens=\(.usage.prompt_tokens // .data.usage.prompt_tokens // 0) completion_tokens=\(.usage.completion_tokens // .data.usage.completion_tokens // 0) cost=$\(.usage.cost // .data.usage.cost // 0)]"' "$body" >&2
+  fi
+  printf '%s\n' "$answer"
 }
 
-RESPONSE=$(query "$(get_token)")
-if ! echo "$RESPONSE" | jq -e '.success' >/dev/null 2>&1; then
-  cline --auto-approve true -t 15 "reply with just: ok" >/dev/null 2>&1 || true
-  RESPONSE=$(query "$(get_token)")
-fi
+agent_mode() {
+  need cline
+  [ "$#" -gt 0 ] || fail "agent mode requires a task"
+  local auto="${ASKCLINE_AUTO_APPROVE:-false}"
+  case "$auto" in true|false) ;; *) fail "ASKCLINE_AUTO_APPROVE must be true or false" ;; esac
+  exec cline --json --cwd "$PWD" --timeout "$TIMEOUT" --model "$MODEL" --auto-approve "$auto" "$*"
+}
 
-if [ -n "${ASKCLINE_VERBOSE:-}" ]; then
-  echo "$RESPONSE" | jq -r '"[\(.data.model // "?") via \(.data.provider // "?") | cost: $\(.data.usage.cost // 0)]"' >&2
-fi
+verify_mode() {
+  need cline
+  [ "$#" -gt 0 ] || fail "verify mode requires a question"
+  export CLINE_COMMAND_PERMISSIONS="${CLINE_COMMAND_PERMISSIONS:-{\"allow\":[\"git status\",\"git diff*\",\"git log*\",\"rg *\",\"find *\",\"cat *\"],\"deny\":[\"rm *\",\"sudo *\",\"git push*\",\"git reset*\",\"git clean*\"],\"allowRedirects\":false}}"
+  local system
+  system='You are operating in verification mode. Disambiguate entities. Retrieve evidence before material factual claims. Cite the evidence you actually inspected. Separate source facts from inference. Never accept a leading premise as true merely because it appears in the question. If evidence is absent, contradictory, or insufficient, say so and abstain. Do not modify files.'
+  exec cline --json --cwd "$PWD" --timeout "$TIMEOUT" --model "$MODEL" --auto-approve true --system "$system" "$*"
+}
 
-echo "$RESPONSE" | jq -r '.data.choices[0].message.content // ("askcline error: " + (.error.message // tostring))'
+doctor_mode() {
+  local failed=0
+  for dep in curl jq; do
+    if command -v "$dep" >/dev/null 2>&1; then printf 'ok   %s\n' "$dep"; else printf 'fail %s\n' "$dep"; failed=1; fi
+  done
+  if command -v cline >/dev/null 2>&1; then
+    printf 'ok   cline: %s\n' "$(cline --version 2>/dev/null | head -n1)"
+  else
+    printf 'warn cline not installed (raw mode still works)\n'
+  fi
+  if [ -n "${CLINE_API_KEY:-}" ]; then printf 'ok   CLINE_API_KEY is set\n'; else printf 'warn CLINE_API_KEY is not set (required for raw mode)\n'; fi
+  printf 'info model=%s\n' "$MODEL"
+  printf 'info api=%s\n' "$API_URL"
+  return "$failed"
+}
+
+case "${1:-}" in
+  -h|--help|'') usage; exit 0 ;;
+  -V|--version) printf '%s\n' "$VERSION"; exit 0 ;;
+  raw) shift; raw_mode "$@" ;;
+  agent) shift; agent_mode "$@" ;;
+  verify) shift; verify_mode "$@" ;;
+  doctor) shift; doctor_mode "$@" ;;
+  *) raw_mode "$@" ;;
+esac
