@@ -96,7 +96,7 @@ The 70-second Remotion film follows four beats:
 3. the shift from answer to loop;
 4. the remaining human responsibility.
 
-Render locally:
+Rendering requires Node.js and FFmpeg:
 
 ```bash
 cd free-intelligence-film
@@ -105,7 +105,7 @@ npm run lint
 npm run render:all
 ```
 
-A GitHub Actions workflow renders the film, poster, and social card from the same source, verifies the movie duration, records SHA-256 hashes in `public/media-manifest.json`, and commits the generated media back to the working branch.
+The render pipeline strips nondeterministic MP4 metadata, fixes the source epoch, and produces the film, poster, and social card from one composition source. GitHub Actions verifies the exact movie duration, records SHA-256 hashes in `public/media-manifest.json`, and fails the pull request unless a clean rerender is byte-identical to the committed media.
 
 ## Validation
 
