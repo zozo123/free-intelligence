@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import {readFile} from "node:fs/promises";
+import {access, readFile} from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
+const hash = /^[a-f0-9]{64}$/;
 
 test("the Remotion source matches the current product architecture", async () => {
   const source = await readFile(new URL("free-intelligence-film/src/Composition.tsx", root), "utf8");
@@ -37,11 +38,31 @@ test("the film package renders deterministic timeline checkpoints", async () => 
   assert.match(pkg.scripts["render:all"], /render:checkpoints/);
 });
 
-test("the current committed media manifest identifies an audited render", async () => {
+test("the committed manifest proves semantic video and deterministic visual checkpoints", async () => {
   const manifest = JSON.parse(await readFile(new URL("public/media-manifest.json", root), "utf8"));
   assert.equal(manifest.story, "field-note-003");
   assert.equal(manifest.duration_seconds, 70);
+  assert.deepEqual(manifest.video, {
+    codec: "h264",
+    width: 1920,
+    height: 1080,
+    frame_rate: "30/1",
+    audio_codec: "aac",
+    audio_sample_rate: 48000,
+  });
+  assert.match(manifest.poster_sha256, hash);
+  assert.match(manifest.og_sha256, hash);
+  assert.deepEqual(Object.keys(manifest.checkpoint_sha256), ["frame_0090", "frame_0540", "frame_0990", "frame_2010"]);
+  for (const value of Object.values(manifest.checkpoint_sha256)) assert.match(value, hash);
   assert.equal(manifest.source, "free-intelligence-film/src/Composition.tsx");
+  assert.match(manifest.verification, /semantic MP4 properties plus deterministic Remotion still checkpoints/);
+
+  await Promise.all([
+    access(new URL("public/checkpoints/frame-0090.png", root)),
+    access(new URL("public/checkpoints/frame-0540.png", root)),
+    access(new URL("public/checkpoints/frame-0990.png", root)),
+    access(new URL("public/checkpoints/frame-2010.png", root)),
+  ]);
 });
 
 test("the main CI workflow uses semantic movie checks and deterministic images", async () => {
