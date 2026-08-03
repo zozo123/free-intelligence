@@ -29,3 +29,110 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
           shellcheck public/askcline
+
+  render-film:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/agent/') && !contains(github.event.head_commit.message, '[rendered film]')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: free-intelligence-film/package-lock.json
+
+      - name: Install film dependencies
+        working-directory: free-intelligence-film
+        run: npm ci
+
+      - name: Validate film source
+        working-directory: free-intelligence-film
+        run: npm run lint
+
+      - name: Render film and deterministic checkpoints
+        working-directory: free-intelligence-film
+        env:
+          SOURCE_DATE_EPOCH: 0
+        run: npm run render:all
+
+      - name: Verify generated media
+        run: |
+          REMOTION="free-intelligence-film/node_modules/.bin/remotion"
+          test -x "$REMOTION"
+          test -s public/free-intelligence-report.mp4
+          test -s public/film-poster.png
+          test -s public/og.png
+          test -s public/checkpoints/frame-0090.png
+          test -s public/checkpoints/frame-0540.png
+          test -s public/checkpoints/frame-0990.png
+          test -s public/checkpoints/frame-2010.png
+
+          duration="$($REMOTION ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          video_codec="$($REMOTION ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          width="$($REMOTION ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          height="$($REMOTION ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          frame_rate="$($REMOTION ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          audio_codec="$($REMOTION ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          audio_rate="$($REMOTION ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+
+          awk "BEGIN { exit !(${duration} >= 69.9 && ${duration} <= 70.1) }"
+          test "$video_codec" = "h264"
+          test "$width" = "1920"
+          test "$height" = "1080"
+          test "$frame_rate" = "30/1"
+          test "$audio_codec" = "aac"
+          test "$audio_rate" = "48000"
+
+          poster_sha="$(sha256sum public/film-poster.png | cut -d' ' -f1)"
+          og_sha="$(sha256sum public/og.png | cut -d' ' -f1)"
+          checkpoint_0090_sha="$(sha256sum public/checkpoints/frame-0090.png | cut -d' ' -f1)"
+          checkpoint_0540_sha="$(sha256sum public/checkpoints/frame-0540.png | cut -d' ' -f1)"
+          checkpoint_0990_sha="$(sha256sum public/checkpoints/frame-0990.png | cut -d' ' -f1)"
+          checkpoint_2010_sha="$(sha256sum public/checkpoints/frame-2010.png | cut -d' ' -f1)"
+
+          cat > public/media-manifest.json <<JSON
+          {
+            "story": "field-note-003",
+            "duration_seconds": 70,
+            "video": {
+              "codec": "${video_codec}",
+              "width": ${width},
+              "height": ${height},
+              "frame_rate": "${frame_rate}",
+              "audio_codec": "${audio_codec}",
+              "audio_sample_rate": ${audio_rate}
+            },
+            "poster_sha256": "${poster_sha}",
+            "og_sha256": "${og_sha}",
+            "checkpoint_sha256": {
+              "frame_0090": "${checkpoint_0090_sha}",
+              "frame_0540": "${checkpoint_0540_sha}",
+              "frame_0990": "${checkpoint_0990_sha}",
+              "frame_2010": "${checkpoint_2010_sha}"
+            },
+            "source": "free-intelligence-film/src/Composition.tsx",
+            "verification": "semantic MP4 properties plus deterministic Remotion still checkpoints"
+          }
+          JSON
+
+      - name: Prove committed media is reproducible
+        if: ${{ github.event_name == 'pull_request' }}
+        run: git diff --exit-code -- public/film-poster.png public/og.png public/checkpoints public/media-manifest.json
+
+      - name: Commit rendered media
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          if git diff --quiet -- public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/checkpoints public/media-manifest.json; then
+            echo "Rendered media is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/checkpoints public/media-manifest.json
+          git commit -m "Render Field Note 003 [rendered film]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

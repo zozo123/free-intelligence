@@ -1,0 +1,22 @@
+{
+  "story": "field-note-003",
+  "duration_seconds": 70,
+  "video": {
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "frame_rate": "30/1",
+    "audio_codec": "aac",
+    "audio_sample_rate": 48000
+  },
+  "poster_sha256": "2ddf7f954bb6b14b9ec9bb272858732653bed5526c48dcfbfeb7234f700f3d0b",
+  "og_sha256": "88f8fa7d83391d39ae9c7bab6eb87a18270ace3f3452682e96274e5668e39978",
+  "checkpoint_sha256": {
+    "frame_0090": "ba6a872880ec2659314e8d45fea5431402b76081a35b8c57cef7f5e86a1453af",
+    "frame_0540": "c08aeed3733737ee5116e5615e0da90ea6813346436bd1d880118910473a1139",
+    "frame_0990": "97e81e2c87562e8281cbb6a5eafd506c3cb6753ff76a634ddba68029de759ac6",
+    "frame_2010": "5f877c51a5025baa0f26c7fd4065ac5afebabee89815c54a3e19add58c9b0fcf"
+  },
+  "source": "free-intelligence-film/src/Composition.tsx",
+  "verification": "semantic MP4 properties plus deterministic Remotion still checkpoints"
+}

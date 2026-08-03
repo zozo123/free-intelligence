@@ -1,20 +1,29 @@
 # Free* Intelligence
 
-**`askcline "task"` is one command for Cline's full end-to-end agent harness.**
+**The model was not the product. The loop is.**
 
-The original field report showed why a bare model completion is not enough: a leading false premise can produce fluent, unsupported history. The current CLI has one execution architecture only:
+Free* Intelligence began as a one-shot experiment: fictional premises went in, polished history came out. The point was never that one particular model was uniquely bad. The point was that a prompt-to-answer architecture had no evidence contract, no observation loop, no permission boundary, and no proof of work.
+
+The project now tells the complete story:
 
 ```text
-askcline "task"
-  -> official Cline CLI
-  -> workspace context and project rules
-  -> tools and observations
-  -> edits and commands
-  -> validation requests and retries
-  -> reported checks and final diff
+OLD
+prompt -> model -> answer
+
+CURRENT
+task -> context -> tools -> observations -> checks -> human review
 ```
 
-There is no direct Chat Completions client in this repository. Authentication, model/provider configuration, streaming, sessions, tools, and the agent loop are delegated to Cline.
+`askcline "task"` routes work through the official Cline CLI. Cline supplies authentication, sessions, workspace context, tools, permissions, and the agent loop. The wrapper adds a finish-line contract: inspect, implement, validate, retry, review, and report exactly what happened.
+
+## The thesis
+
+- Models propose.
+- Harnesses act.
+- Evidence decides.
+- Humans remain accountable.
+
+A harness makes consequential work more observable and governable. It does not make generated work automatically correct.
 
 ## Install
 
@@ -27,88 +36,87 @@ export PATH="$HOME/.local/bin:$PATH"
 askcline doctor
 ```
 
-## One command
-
-Run it inside the repository you want Cline to own end-to-end:
+Then run from a clean branch:
 
 ```bash
-cd my-repository
 askcline "inspect the repo, implement the issue, run every relevant check, fix failures, and leave it ready to merge"
 ```
 
-The default mode uses Cline Act mode with tool auto-approval, high reasoning effort, five consecutive-mistake retries, no artificial timeout, project rules, and an explicit inspect -> implement -> validate -> retry -> review -> summarize contract.
+## Execution modes
 
-**Autonomy warning:** the default agent path uses `--auto-approve true`. It can edit files and run commands. The deny policy is a guardrail, not a sandbox. Use a clean branch, review the diff, or set `ASKCLINE_AUTO_APPROVE=false`.
-
-## Modes
-
-Every mode below invokes the official Cline CLI harness:
+Every executable path uses the official Cline CLI:
 
 ```bash
-askcline                                  # interactive Cline in this workspace
-askcline agent "fix the tests"            # explicit autonomous agent mode
-askcline plan "design the migration"      # Cline Plan mode
-askcline verify "did this happen?"        # read-only Plan mode + evidence contract
-askcline text "summarize this document"   # read-only Plan mode + direct-answer contract
-askcline raw "legacy prompt"              # deprecated alias for text; still Cline Plan mode
-askcline doctor                           # official Cline diagnostics
+askcline                                  # interactive Cline
+askcline agent "fix the tests"            # autonomous Act mode
+askcline plan "design the migration"      # read-only Plan mode
+askcline verify "did this happen?"        # evidence-oriented Plan mode
+askcline text "summarize this document"   # read-only Plan mode
+askcline raw "legacy prompt"              # deprecated alias to text mode
+askcline doctor                           # official diagnostics
 ```
 
-`raw` remains only as a compatibility alias. It no longer performs an HTTP request and does not require a separate API key. `plan`, `verify`, `text`, and `raw` are routed through Cline Plan mode so autonomous edits are reserved for the default agent path.
+The default task path uses auto-approval and can edit files or run commands. The wrapper is not a sandbox. Keep permissions narrow, use a clean branch, and review the final diff and evidence.
 
-## Configuration
+## Price truth
 
-```bash
-ASKCLINE_AUTO_APPROVE=false askcline "review only"
-ASKCLINE_JSON=true askcline "list the TODOs"
-CLINE_MODEL=provider/model askcline "run the task"
-CLINE_PROVIDER=cline askcline "run the task"
-CLINE_THINKING=xhigh askcline "solve the difficult issue"
-CLINE_TIMEOUT=600 askcline "finish within ten minutes"
-```
+The wrapper is free and open source. The model or provider configured in Cline may be free or paid. “Free” describes the original experiment and the wrapper—not a universal per-run price guarantee.
 
-The wrapper sets a narrow deny policy for catastrophic host and force-push commands unless `ASKCLINE_UNRESTRICTED=true` is explicitly supplied.
+## Historical receipts
 
-## Verified Cline contract
+The three fictional-premise prompts and outputs were preserved from the original one-shot experiment on **2 August 2026**. The exact model configuration was not preserved. They are useful historical demonstrations, not a reproducible benchmark.
 
-The implementation follows the current official CLI contract:
+The browser experience is static: it makes no model request and accepts no credentials.
 
-- prompts start in Act mode;
-- `--auto-approve` controls unattended tool execution;
-- `--cwd` selects the workspace;
-- `--thinking` controls reasoning effort;
-- `--retries` controls consecutive-mistake tolerance;
-- `--json` produces NDJSON events;
-- `--plan` selects Plan mode;
-- `CLINE_COMMAND_PERMISSIONS` restricts shell commands;
-- `cline doctor` performs official diagnostics.
+## Site
 
-The finish-line prompt is a behavioral contract, not a proof system. Review the reported commands, test output, and final diff before publishing.
+The GitHub Pages site is published from the repository root:
 
-## Validation
+- `index.html`
+- `styles.css`
+- `app.js`
+- `public/askcline`
+- `public/free-intelligence-report.mp4`
+- `public/film-poster.png`
+- `public/og.png`
+- `public/checkpoints/*.png`
+- `public/media-manifest.json`
 
-```bash
-npm test
-bash -n public/askcline
-```
-
-The deterministic suite verifies:
-
-- plain tasks dispatch to the autonomous Cline harness;
-- plan, verify, text, raw-compatibility, interactive, and doctor paths all invoke `cline`;
-- verify, text, and raw compatibility paths include `--plan` and disable auto-approval;
-- the finish-line task contract and safety overrides are preserved;
-- no source file contains a direct Cline API client or private-token access;
-- the public site remains static and never accepts credentials.
-
-GitHub Actions run the suite on Ubuntu and macOS and run ShellCheck on Linux.
-
-## Field report
-
-The GitHub Pages site preserves the three fictional-premise captures and the 60-second film as historical evidence of the old one-shot experiment. The downloadable command itself is harness-only.
+Preview locally:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Free describes the price. The harness determines the behavior. Evidence determines whether the result is ready.
+## Film
+
+The 70-second Remotion film follows four beats:
+
+1. the historical receipt;
+2. the architectural failure;
+3. the shift from answer to loop;
+4. the remaining human responsibility.
+
+Rendering requires Node.js and FFmpeg:
+
+```bash
+cd free-intelligence-film
+npm ci
+npm run lint
+npm run render:all
+```
+
+Lossy MP4 encoders may produce different container bytes for an equivalent render, so CI does not pretend that byte identity is a meaningful correctness guarantee. Instead, it strictly verifies the movie’s duration, codecs, dimensions, frame rate, and audio rate, and compares deterministic Remotion stills from four points on the actual film timeline byte-for-byte. Poster, social card, checkpoint hashes, and semantic movie properties are recorded in `public/media-manifest.json`.
+
+## Validation
+
+```bash
+npm ci
+npm test
+bash -n public/askcline
+cd free-intelligence-film && npm ci && npm run lint
+```
+
+CI runs the root tests on Ubuntu and macOS, validates the Bash wrapper, runs ShellCheck on Linux, renders the complete film, and verifies its semantic and visual checkpoints before merge.
+
+Free is a price. Intelligence is a process. Evidence is the standard.
