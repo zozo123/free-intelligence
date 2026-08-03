@@ -50,18 +50,20 @@ jobs:
         working-directory: free-intelligence-film
         run: npm ci
 
+      - name: Install media tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Validate film source
         working-directory: free-intelligence-film
         run: npm run lint
 
-      - name: Render film and share assets
+      - name: Render and normalize film assets
         working-directory: free-intelligence-film
+        env:
+          SOURCE_DATE_EPOCH: 0
         run: npm run render:all
-
-      - name: Install media verification tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
 
       - name: Verify generated media
         run: |
@@ -79,10 +81,15 @@ jobs:
             "video_sha256": "${video_sha}",
             "poster_sha256": "${poster_sha}",
             "og_sha256": "${og_sha}",
-            "source": "free-intelligence-film/src/Composition.tsx"
+            "source": "free-intelligence-film/src/Composition.tsx",
+            "normalization": "ffmpeg metadata stripped; SOURCE_DATE_EPOCH=0"
           }
           JSON
           awk "BEGIN { exit !(${duration} >= 69.9 && ${duration} <= 70.1) }"
+
+      - name: Prove committed media is reproducible
+        if: ${{ github.event_name == 'pull_request' }}
+        run: git diff --exit-code -- public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/media-manifest.json
 
       - name: Commit rendered media
         if: ${{ github.event_name == 'push' }}
