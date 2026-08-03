@@ -34,10 +34,13 @@ test("documentation and the public site describe one harness architecture", asyn
     readFile(new URL("README.md", root), "utf8"),
     readFile(new URL("index.html", root), "utf8"),
   ]);
-  assert.match(readme, /There is no direct Chat Completions client/);
-  assert.match(html, /NO DIRECT MODEL HTTP CLIENT/);
-  assert.doesNotMatch(readme, /export CLINE_API_KEY|Raw API calls require/);
-  assert.doesNotMatch(html, /temporary Cline token|\/api\/ask/i);
+  assert.match(readme, /Every executable path uses the official Cline CLI/);
+  assert.match(readme, /prompt -> model -> answer/);
+  assert.match(readme, /task -> context -> tools -> observations -> checks -> human review/);
+  assert.match(html, /THE CURRENT UNIT/);
+  assert.match(html, /AGENT HARNESS/);
+  assert.doesNotMatch(readme, /export CLINE_API_KEY|Raw API calls require|direct Chat Completions client/i);
+  assert.doesNotMatch(html, /temporary Cline token|\/api\/ask|api\.cline\.bot/i);
 });
 
 test("the root package contains no dormant application runtime", async () => {
