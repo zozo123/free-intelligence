@@ -28,9 +28,10 @@
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
     "render:film": "remotion render src/index.ts FreeIntelligenceReport ../public/free-intelligence-report.mp4 --codec=h264 --crf=20",
+    "normalize:film": "ffmpeg -hide_banner -loglevel error -y -i ../public/free-intelligence-report.mp4 -map 0 -map_metadata -1 -map_chapters -1 -c copy -fflags +bitexact -movflags +faststart -metadata creation_time=1970-01-01T00:00:00Z ../public/free-intelligence-report.normalized.mp4 && mv ../public/free-intelligence-report.normalized.mp4 ../public/free-intelligence-report.mp4",
     "render:poster": "remotion still src/index.ts FreeIntelligencePoster ../public/film-poster.png",
     "render:og": "remotion still src/index.ts FreeIntelligenceOg ../public/og.png",
-    "render:all": "npm run render:film && npm run render:poster && npm run render:og"
+    "render:all": "npm run render:film && npm run normalize:film && npm run render:poster && npm run render:og"
   },
   "sideEffects": [
     "*.css"
