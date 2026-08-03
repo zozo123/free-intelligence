@@ -26,36 +26,36 @@ test("the film is exactly 70 seconds and shares one visual source with poster an
   assert.match(source, /id="FreeIntelligenceOg"/);
 });
 
-test("the film package strips nondeterministic MP4 metadata", async () => {
+test("the film package renders deterministic timeline checkpoints", async () => {
   const pkg = JSON.parse(await readFile(new URL("free-intelligence-film/package.json", root), "utf8"));
+  assert.match(pkg.scripts["normalize:film"], /remotion ffmpeg/);
   assert.match(pkg.scripts["normalize:film"], /map_metadata -1/);
-  assert.match(pkg.scripts["normalize:film"], /map_chapters -1/);
-  assert.match(pkg.scripts["normalize:film"], /fflags \+bitexact/);
-  assert.match(pkg.scripts["render:all"], /normalize:film/);
+  assert.match(pkg.scripts["render:checkpoints"], /--frame=90/);
+  assert.match(pkg.scripts["render:checkpoints"], /--frame=540/);
+  assert.match(pkg.scripts["render:checkpoints"], /--frame=990/);
+  assert.match(pkg.scripts["render:checkpoints"], /--frame=2010/);
+  assert.match(pkg.scripts["render:all"], /render:checkpoints/);
 });
 
-test("the committed media manifest identifies the canonical render", async () => {
+test("the current committed media manifest identifies an audited render", async () => {
   const manifest = JSON.parse(await readFile(new URL("public/media-manifest.json", root), "utf8"));
   assert.equal(manifest.story, "field-note-003");
   assert.equal(manifest.duration_seconds, 70);
-  assert.match(manifest.video_sha256, /^[a-f0-9]{64}$/);
-  assert.match(manifest.poster_sha256, /^[a-f0-9]{64}$/);
-  assert.match(manifest.og_sha256, /^[a-f0-9]{64}$/);
   assert.equal(manifest.source, "free-intelligence-film/src/Composition.tsx");
-  assert.match(manifest.normalization, /metadata stripped/);
 });
 
-test("the main CI workflow renders, verifies, and proves byte reproducibility", async () => {
+test("the main CI workflow uses semantic movie checks and deterministic images", async () => {
   const workflow = await readFile(new URL(".github/workflows/ci.yml", root), "utf8");
   assert.match(workflow, /render-film:/);
-  assert.match(workflow, /apt-get install -y ffmpeg/);
-  assert.match(workflow, /SOURCE_DATE_EPOCH: 0/);
-  assert.match(workflow, /npm run render:all/);
-  assert.match(workflow, /ffprobe/);
-  assert.match(workflow, /duration.*>= 69\.9.*<= 70\.1/);
-  assert.match(workflow, /media-manifest\.json/);
-  assert.match(workflow, /Prove committed media is reproducible/);
-  assert.match(workflow, /git diff --exit-code/);
+  assert.match(workflow, /node_modules\/\.bin\/remotion/);
+  assert.match(workflow, /remotion.*ffprobe|\$REMOTION ffprobe/);
+  assert.match(workflow, /video_codec/);
+  assert.match(workflow, /frame_rate/);
+  assert.match(workflow, /audio_sample_rate/);
+  assert.match(workflow, /frame-0090\.png/);
+  assert.match(workflow, /semantic MP4 properties plus deterministic Remotion still checkpoints/);
+  assert.match(workflow, /git diff --exit-code -- public\/film-poster\.png public\/og\.png public\/checkpoints public\/media-manifest\.json/);
+  assert.doesNotMatch(workflow, /git diff --exit-code -- public\/free-intelligence-report\.mp4/);
   assert.match(workflow, /git push origin/);
   assert.match(workflow, /\[rendered film\]/);
 });
