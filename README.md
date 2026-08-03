@@ -79,6 +79,7 @@ The GitHub Pages site is published from the repository root:
 - `public/free-intelligence-report.mp4`
 - `public/film-poster.png`
 - `public/og.png`
+- `public/media-manifest.json`
 
 Preview locally:
 
@@ -104,7 +105,7 @@ npm run lint
 npm run render:all
 ```
 
-A GitHub Actions workflow renders the film, poster, and social card from the same source and commits the generated media back to the working branch.
+A GitHub Actions workflow renders the film, poster, and social card from the same source, verifies the movie duration, records SHA-256 hashes in `public/media-manifest.json`, and commits the generated media back to the working branch.
 
 ## Validation
 
