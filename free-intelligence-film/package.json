@@ -31,7 +31,8 @@
     "normalize:film": "ffmpeg -hide_banner -loglevel error -y -i ../public/free-intelligence-report.mp4 -map 0 -map_metadata -1 -map_chapters -1 -c copy -fflags +bitexact -movflags +faststart -metadata creation_time=1970-01-01T00:00:00Z ../public/free-intelligence-report.normalized.mp4 && mv ../public/free-intelligence-report.normalized.mp4 ../public/free-intelligence-report.mp4",
     "render:poster": "remotion still src/index.ts FreeIntelligencePoster ../public/film-poster.png",
     "render:og": "remotion still src/index.ts FreeIntelligenceOg ../public/og.png",
-    "render:all": "npm run render:film && npm run normalize:film && npm run render:poster && npm run render:og"
+    "render:checkpoints": "mkdir -p ../public/checkpoints && remotion still src/index.ts FreeIntelligenceReport ../public/checkpoints/frame-0090.png --frame=90 && remotion still src/index.ts FreeIntelligenceReport ../public/checkpoints/frame-0540.png --frame=540 && remotion still src/index.ts FreeIntelligenceReport ../public/checkpoints/frame-0990.png --frame=990 && remotion still src/index.ts FreeIntelligenceReport ../public/checkpoints/frame-2010.png --frame=2010",
+    "render:all": "npm run render:film && npm run normalize:film && npm run render:poster && npm run render:og && npm run render:checkpoints"
   },
   "sideEffects": [
     "*.css"
