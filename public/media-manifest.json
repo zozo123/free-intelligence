@@ -1,7 +1,7 @@
 {
   "story": "field-note-003",
   "duration_seconds": 70.000000,
-  "video_sha256": "42b828350e4c3470a6c85d31522fc4b46f5b098ffe5becd73c09cb2d168afc28",
+  "video_sha256": "07c07b1ea45e0d9d1aebdd850d2eb56b2c53ce16c0a0569f104beab7c8e98c5d",
   "poster_sha256": "2ddf7f954bb6b14b9ec9bb272858732653bed5526c48dcfbfeb7234f700f3d0b",
   "og_sha256": "88f8fa7d83391d39ae9c7bab6eb87a18270ace3f3452682e96274e5668e39978",
   "source": "free-intelligence-film/src/Composition.tsx"
