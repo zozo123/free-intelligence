@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Free* Intelligence — askcline, now fully agentic</title>
-    <meta name="description" content="A field report about raw-model hallucination and askcline 1.0: one command for Cline's full end-to-end agent harness." />
+    <title>Free* Intelligence — askcline harness only</title>
+    <meta name="description" content="The field report behind askcline: historical raw-model receipts and a current CLI that routes every task through Cline's full agent harness." />
     <link rel="canonical" href="https://zozo123.github.io/free-intelligence/" />
-    <meta property="og:title" content="Free* Intelligence — askcline 1.0" />
-    <meta property="og:description" content="The raw model invented history. The new default is the full Cline agent harness." />
+    <meta property="og:title" content="Free* Intelligence — askcline harness only" />
+    <meta property="og:description" content="One command. The official Cline CLI. Tools, retries, validation, and no direct model endpoint." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zozo123.github.io/free-intelligence/" />
     <meta property="og:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
@@ -19,9 +19,9 @@
     <a class="skip-link" href="#main">Skip to report</a>
     <nav class="masthead" aria-label="Primary navigation">
       <a class="wordmark" href="#top">ASKCLINE<span>*</span></a>
-      <div class="nav-center">FREE INTELLIGENCE / AGENT HARNESS 1.0</div>
+      <div class="nav-center">FREE INTELLIGENCE / HARNESS-ONLY 1.1</div>
       <div class="nav-links">
-        <a href="#film">WATCH</a>
+        <a href="#harness">HARNESS</a>
         <a href="#receipts">RECEIPTS</a>
         <a href="#install">INSTALL</a>
       </div>
@@ -30,76 +30,72 @@
     <main id="main">
       <section class="hero" id="top">
         <div class="hero-copy">
-          <p class="eyebrow">FROM ONE-SHOT MODEL CALL TO END-TO-END AGENT</p>
-          <h1>WE ASKED ABOUT THINGS THAT <span>NEVER HAPPENED.</span></h1>
-          <p class="hero-dek">The raw endpoint wrote the history anyway. So <code>askcline</code> now defaults to Cline's full agent harness.</p>
+          <p class="eyebrow">ONE COMMAND / THE FULL CLINE AGENT</p>
+          <h1>EVERY TASK GOES THROUGH <span>THE HARNESS.</span></h1>
+          <p class="hero-dek"><code>askcline "task"</code> delegates workspace context, tools, execution, retries, and validation to the official Cline CLI.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#install">Install the agent</a>
-            <a class="button text-button" href="#film">Watch the field report <span aria-hidden="true">↘</span></a>
+            <a class="button primary" href="#install">Install askcline</a>
+            <a class="button text-button" href="#receipts">See why the harness matters <span aria-hidden="true">↘</span></a>
           </div>
         </div>
-        <div class="hero-evidence" aria-label="Three captured raw-model hallucinations">
-          <article class="hero-clipping clipping-one"><span>RAW CAPTURE 01</span><strong>RACLETTE DECLARED<br />“A PEACEFUL CHEESE”</strong><em>Treaty: imaginary. Tone: official.</em></article>
-          <article class="hero-clipping clipping-two"><span>RAW CAPTURE 02</span><strong>TOASTER LAUNCHES<br />BAGUETTE INTO CROWD</strong><em>Expo: invented. Trajectory: precise.</em></article>
-          <article class="hero-clipping clipping-three"><span>RAW CAPTURE 03</span><strong>CLUB SANDWICH<br />A “TRIPLE THREAT”</strong><em>Director: Dr. Crumbworthy, apparently.</em></article>
-          <div class="confidence-stamp">RAW<br />OUTPUTS</div>
+        <div class="hero-evidence" aria-label="Harness execution loop">
+          <article class="hero-clipping clipping-one"><span>01 / INSPECT</span><strong>READ THE REPO<br />AND ITS RULES</strong><em>Context before code.</em></article>
+          <article class="hero-clipping clipping-two"><span>02 / EXECUTE</span><strong>TOOLS, EDITS,<br />COMMANDS, RETRIES</strong><em>Observations feed the loop.</em></article>
+          <article class="hero-clipping clipping-three"><span>03 / VERIFY</span><strong>TEST, REVIEW,<br />REPORT HONESTLY</strong><em>No unrun checks claimed.</em></article>
+          <div class="confidence-stamp">CLINE<br />HARNESS</div>
         </div>
-        <p class="asterisk-note"><span>*</span> Free describes the price. The harness determines the behavior.</p>
+        <p class="asterisk-note"><span>*</span> The wrapper adds a finish-line contract. Cline supplies the actual agent runtime.</p>
       </section>
 
-      <div class="ticker" aria-label="Product summary">
-        <span>ONE COMMAND</span><i>◆</i><span>FULL WORKSPACE</span><i>◆</i><span>TOOLS + EDITS</span><i>◆</i><span>TEST + RETRY</span><i>◆</i><span>FINISH THE TASK</span>
+      <div class="ticker" aria-label="Architecture summary">
+        <span>ONE CLI PATH</span><i>◆</i><span>NO DIRECT MODEL HTTP CLIENT</span><i>◆</i><span>PROJECT RULES</span><i>◆</i><span>TOOLS + VALIDATION</span>
       </div>
 
-      <section class="mechanism" id="how">
+      <section class="mechanism" id="harness">
         <div class="mechanism-title">
-          <p class="eyebrow">WHAT ASKCLINE IS NOW</p>
-          <h2>One command into Cline's full agent harness.</h2>
-          <p><code>askcline "task"</code> delegates to the official Cline CLI in the current workspace. It inspects the repository, uses tools, edits files, runs commands, validates the result, diagnoses failures, retries, reviews the diff, and reports what is actually finished. The historical one-shot path remains explicit as <code>askcline raw</code>.</p>
+          <p class="eyebrow">THE CURRENT PRODUCT</p>
+          <h2>One command to take a repository to the finish line.</h2>
+          <p>A plain task starts Cline in the current workspace, uses Act mode, applies high reasoning and retry settings, preserves project rules, and asks the agent to inspect, implement, validate, retry, review, and summarize.</p>
         </div>
-        <div class="pipeline" role="list" aria-label="How agentic askcline works">
-          <div role="listitem"><b>01</b><strong>YOUR TASK</strong><span>Describe the finish line once.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>02</b><strong>INSPECT + ACT</strong><span>Cline reads, searches, edits, and executes.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>03</b><strong>TEST + RETRY</strong><span>Failures become observations, not the final answer.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>04</b><strong>FINISHED STATE</strong><span>Diff reviewed. Checks reported honestly.</span></div>
+        <div class="pipeline" role="list" aria-label="How askcline works">
+          <div role="listitem"><b>01</b><strong>YOUR TASK</strong><span>Natural language from the current repository.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>02</b><strong>CLINE CLI</strong><span>Official auth, sessions, context, and agent loop.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>03</b><strong>TOOLS</strong><span>Files, terminal, browser, rules, and observations.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>04</b><strong>VALIDATED RESULT</strong><span>Checks run, failures retried, diff reviewed.</span></div>
         </div>
         <div class="terminal-card compact-terminal">
-          <div class="terminal-top"><span>workspace/my-repo</span><span>zsh</span></div>
-          <pre><code><span class="prompt">$</span> askcline &quot;inspect this repo, fix the issue, run all checks, and finish&quot;
-[reads files → edits code → runs tests → retries → summarizes]
+          <div class="terminal-top"><span>my-repository</span><span>zsh</span></div>
+          <pre><code><span class="prompt">$</span> askcline "implement the issue end-to-end, run every relevant check, fix failures, and leave it ready to merge"
 
-<span class="prompt">$</span> ASKCLINE_AUTO_APPROVE=false askcline &quot;review and fix carefully&quot;
-[approval-gated agent run]
+<span class="prompt">$</span> askcline plan "design the migration"
 
-<span class="prompt">$</span> askcline verify &quot;did this event actually happen?&quot;
-[evidence, citations, uncertainty, or abstention]
+<span class="prompt">$</span> askcline verify "did this event actually happen?"
 
-<span class="prompt">$</span> askcline raw &quot;summarize this:&quot; &quot;$(cat notes.txt)&quot;
-[one stateless completion]</code></pre>
+<span class="prompt">$</span> askcline text "summarize this document"</code></pre>
         </div>
       </section>
 
       <section class="film-section" id="film">
         <div class="film-intro">
-          <p class="eyebrow light">THE ORIGINAL FAILURE CASE</p>
+          <p class="eyebrow light">THE ORIGINAL FIELD REPORT</p>
           <h2>Sixty seconds.<br />Three invented histories.</h2>
-          <p>The film preserves the raw-model experiment that motivated the harness. These are real captured answers to intentionally fictional premises.</p>
-          <div class="film-note"><strong>60 SEC</strong><span>Original non-vocal score<br />Actual raw receipts</span></div>
+          <p>The film preserves the experiment that motivated the redesign: a one-shot model accepted fictional premises and wrote polished history. It is evidence for adding a harness, not the current execution path.</p>
+          <div class="film-note"><strong>60 SEC</strong><span>Historical receipts<br />Current CLI: harness only</span></div>
         </div>
         <div class="video-frame">
           <video controls preload="metadata" poster="./public/film-poster.png">
             <source src="./public/free-intelligence-report.mp4" type="video/mp4" />
             Your browser does not support embedded video.
           </video>
-          <div class="video-label"><span>FIELD REPORT 002</span><span>RAW MODE · SOURCES OFF</span></div>
+          <div class="video-label"><span>FIELD REPORT 002</span><span>HISTORICAL RAW-MODEL CAPTURES</span></div>
         </div>
       </section>
 
       <section class="receipts-section" id="receipts">
         <header class="section-heading">
-          <p class="eyebrow">THE RAW-MODE RECEIPTS</p>
-          <h2>False premise in.<br />Polished “fact” out.</h2>
-          <p>These exact answers were captured on August 2, 2026 from the old one-shot behavior, now available only through <code>askcline raw</code>. Select a receipt to inspect it.</p>
+          <p class="eyebrow">THINGS THAT <span>NEVER HAPPENED.</span></p>
+          <h2>The receipts explain<br />why tools and evidence matter.</h2>
+          <p>Select a fictional premise to read the unedited historical response. The browser makes no live request and accepts no credentials.</p>
         </header>
         <div class="receipt-tabs" role="tablist" aria-label="Captured answers">
           <button type="button" role="tab" data-evidence="0"><b>01</b><span>MOON CHEESE<br />ACCORD</span></button>
@@ -109,16 +105,8 @@
         <article class="receipt" aria-live="polite">
           <div class="receipt-top"><span id="receipt-number">CAPTURE 01</span><span id="receipt-slug">DIPLOMATIC CHEESE</span></div>
           <div class="receipt-grid">
-            <div class="receipt-prompt">
-              <p class="micro-label">PROMPT</p>
-              <code><span>$</span> <span id="receipt-prompt"></span></code>
-              <p class="evidence-mode"><strong>STATIC EVIDENCE</strong> This page never accepts credentials or pretends a replay is live.</p>
-            </div>
-            <div class="receipt-answer">
-              <p class="micro-label">MODEL ANSWER / UNEDITED</p>
-              <blockquote id="receipt-answer"></blockquote>
-              <div class="editor-note"><strong>EDITOR’S NOTE</strong><span id="receipt-verdict"></span></div>
-            </div>
+            <div class="receipt-prompt"><p class="micro-label">PROMPT</p><code><span>$</span> <span id="receipt-prompt"></span></code></div>
+            <div class="receipt-answer"><p class="micro-label">HISTORICAL MODEL ANSWER / UNEDITED</p><blockquote id="receipt-answer"></blockquote><div class="editor-note"><strong>EDITOR'S NOTE</strong><span id="receipt-verdict"></span></div></div>
           </div>
         </article>
       </section>
@@ -126,55 +114,35 @@
       <section class="install-section" id="install">
         <div class="install-heading">
           <p class="eyebrow light">INSTALL ASKCLINE</p>
-          <h2>One command.<br />Full agent.</h2>
-          <p>The wrapper is readable Bash. It delegates authentication and the complete agent loop to the official Cline CLI; it does not scrape private session tokens.</p>
+          <h2>Authenticate once.<br />Run from any repo.</h2>
+          <p>The wrapper never reads private token files and contains no direct Cline API client.</p>
         </div>
         <div class="install-body">
           <ol class="install-steps">
-            <li><b>1</b><div><strong>Install and authenticate Cline</strong><code>cline auth cline</code></div></li>
+            <li><b>1</b><div><strong>Authenticate the official CLI</strong><code>cline auth cline</code></div></li>
             <li><b>2</b><div><strong>Install the wrapper</strong><div class="install-command"><code id="install-command">Preparing GitHub Pages URL…</code><button type="button" id="copy-install">COPY</button></div></div></li>
-            <li><b>3</b><div><strong>Add it to your PATH</strong><code>export PATH="$HOME/.local/bin:$PATH"</code></div></li>
-            <li><b>4</b><div><strong>Conquer the task</strong><code>askcline "inspect, implement, test, retry, and finish"</code></div></li>
+            <li><b>3</b><div><strong>Add it to PATH</strong><code>export PATH="$HOME/.local/bin:$PATH"</code></div></li>
+            <li><b>4</b><div><strong>Finish a task</strong><code>askcline "inspect, implement, validate, retry, and finish"</code></div></li>
           </ol>
-          <aside class="requirements">
-            <p class="micro-label">PRIMARY REQUIREMENT</p>
-            <ul><li>Cline CLI</li><li>An authenticated provider</li><li>A repository you are prepared to modify</li></ul>
-            <p class="micro-label">RAW MODE ONLY</p>
-            <ul><li><code>curl</code> + <code>jq</code></li><li><code>CLINE_API_KEY</code></li></ul>
-            <a class="button primary download-button" href="./public/askcline" download>Download the script</a>
-            <p class="security-note"><strong>SAFETY NOTE</strong> Autonomous mode defaults on. Use a clean branch, review the diff, or set <code>ASKCLINE_AUTO_APPROVE=false</code>.</p>
-          </aside>
+          <aside class="requirements"><p class="micro-label">REQUIRES</p><ul><li>Cline CLI</li><li>An authenticated provider</li><li>A repository workspace</li></ul><a class="button primary download-button" href="./public/askcline" download>Download the script</a></aside>
         </div>
       </section>
 
       <section class="diagnosis">
         <header class="section-heading dark-heading">
-          <p class="eyebrow light">THE ARCHITECTURAL LESSON</p>
-          <h2>A query point is not<br />an agent harness.</h2>
-          <p>The same model behaves differently when it can inspect reality, act, observe failures, and iterate. A harness improves the process; it still does not make every claim true.</p>
+          <p class="eyebrow light">THE LESSON</p>
+          <h2>False premise in.<br />Polished “fact” out.</h2>
+          <p>A completion endpoint can return text and tool-call requests. The harness is what executes tools, observes results, continues the loop, applies permissions, and validates the outcome.</p>
         </header>
         <div class="diagnosis-grid">
-          <article><span>01</span><h3>Context</h3><p>The agent sees the workspace, repository instructions, files, and command output instead of only one prompt.</p></article>
-          <article><span>02</span><h3>Action</h3><p>It can use tools, edit files, execute checks, and turn results into the next decision.</p></article>
-          <article><span>03</span><h3>Iteration</h3><p>A failing test is feedback. The loop continues until validation passes or a real blocker remains.</p></article>
-          <article><span>04</span><h3>Evidence</h3><p>Verification mode requires retrieval, disambiguation, citations, uncertainty, and abstention.</p></article>
-        </div>
-        <div class="diagnosis-punchline"><span>THE PRODUCT</span><strong>One task in.<br />A validated workspace out.</strong><em>Then review the diff.</em></div>
-      </section>
-
-      <section class="rules">
-        <div class="rules-heading"><p class="eyebrow">OPERATING POLICY</p><h2>Autonomous enough to finish.<br />Explicit enough to control.</h2></div>
-        <div class="rule-columns">
-          <div class="rule yes"><span>DEFAULT AGENT</span><ul><li>Inspect and understand</li><li>Implement complete changes</li><li>Run checks and retry</li><li>Review and summarize</li></ul></div>
-          <div class="rule no"><span>KEEP EXPLICIT</span><ul><li>Raw completion</li><li>Force pushes and releases</li><li>Claims without evidence</li><li>Anything outside the requested scope</li></ul></div>
+          <article><span>01</span><h3>Workspace context</h3><p>Cline reads the repository, instructions, rules, and relevant files before changing code.</p></article>
+          <article><span>02</span><h3>Observation loop</h3><p>Commands and tools produce results that become the next step's evidence.</p></article>
+          <article><span>03</span><h3>Permissions</h3><p>Auto-approval and command policies control autonomous execution.</p></article>
+          <article><span>04</span><h3>Validation</h3><p>The task contract requires real checks and honest reporting instead of fluent completion theater.</p></article>
         </div>
       </section>
     </main>
 
-    <footer>
-      <div class="footer-mark">ASKCLINE<span>*</span></div>
-      <p>One command. The whole harness.</p>
-      <p class="footer-small">The comic subjects are fictional. Their displayed answers are unedited raw-model output, not factual claims.</p>
-    </footer>
+    <footer><div class="footer-mark">ASKCLINE<span>*</span></div><p>One command. One harness. No bypass.</p><p class="footer-small">The comic subjects are fictional historical test prompts. The current downloadable CLI routes every mode through Cline.</p></footer>
   </body>
 </html>
