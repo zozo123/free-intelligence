@@ -29,3 +29,64 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
           shellcheck public/askcline
+
+  render-film:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/agent/') && !contains(github.event.head_commit.message, '[rendered film]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: free-intelligence-film/package-lock.json
+
+      - name: Install film dependencies
+        working-directory: free-intelligence-film
+        run: npm ci
+
+      - name: Validate film source
+        working-directory: free-intelligence-film
+        run: npm run lint
+
+      - name: Render film and share assets
+        working-directory: free-intelligence-film
+        run: npm run render:all
+
+      - name: Verify generated media
+        run: |
+          test -s public/free-intelligence-report.mp4
+          test -s public/film-poster.png
+          test -s public/og.png
+          duration="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 public/free-intelligence-report.mp4)"
+          video_sha="$(sha256sum public/free-intelligence-report.mp4 | cut -d' ' -f1)"
+          poster_sha="$(sha256sum public/film-poster.png | cut -d' ' -f1)"
+          og_sha="$(sha256sum public/og.png | cut -d' ' -f1)"
+          cat > public/media-manifest.json <<JSON
+          {
+            "story": "field-note-003",
+            "duration_seconds": ${duration},
+            "video_sha256": "${video_sha}",
+            "poster_sha256": "${poster_sha}",
+            "og_sha256": "${og_sha}",
+            "source": "free-intelligence-film/src/Composition.tsx"
+          }
+          JSON
+          awk "BEGIN { exit !(${duration} >= 69.9 && ${duration} <= 70.1) }"
+
+      - name: Commit rendered media
+        run: |
+          if git diff --quiet -- public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/media-manifest.json; then
+            echo "Rendered media is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/media-manifest.json
+          git commit -m "Render Field Note 003 [rendered film]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
