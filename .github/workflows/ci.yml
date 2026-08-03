@@ -58,6 +58,11 @@ jobs:
         working-directory: free-intelligence-film
         run: npm run render:all
 
+      - name: Install media verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Verify generated media
         run: |
           test -s public/free-intelligence-report.mp4
