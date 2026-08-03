@@ -1,52 +1,20 @@
 # Free* Intelligence
 
-A static GitHub Pages field report about `askcline`: a tiny Bash wrapper that sends a one-shot prompt to Cline’s free-model chat endpoint and prints only the answer to stdout.
+**The same model behaves very differently with and without a harness.**
 
-Field Note 002 uses three intentionally fictional prompts: the Reykjavik Moon Cheese Accord, Dr. Percival Crumb’s left-handed toaster, and the International Bureau of Suspicious Sandwiches. The displayed answers were captured from the real wrapper, unedited. They show how readily a leading false premise can become polished, source-free history.
+This repository is both a static field report about confident false-premise completion and a small, testable CLI that makes the execution boundary explicit:
 
-## What is included
-
-- A no-install, static evidence exhibit that transparently replays the three captured answers.
-- The downloadable `askcline` Bash wrapper.
-- A 60-second Remotion report with an original non-vocal score, sound design, and editorial newsprint motion graphics.
-- A complete installation guide, terminal examples, and the one-line prompt-to-stdout mechanism.
-- A practical explanation of the failure mode: leading premise, no retrieval, no source contract, and fluent specificity.
-
-The public site intentionally does not accept Cline credentials. GitHub Pages has no private server, and an access token should never be embedded in a static site.
-
-## GitHub Pages
-
-The deployable site is the repository root:
-
-- `index.html`
-- `styles.css`
-- `app.js`
-- `public/free-intelligence-report.mp4`
-- `public/film-poster.png`
-- `public/og.png`
-- `public/askcline`
-
-GitHub Pages publishes directly from the `main` branch root.
-
-## How `askcline` works
-
-1. Joins the command-line arguments into one prompt.
-2. Reads the access token from an existing authenticated Cline CLI session.
-3. Sends one OpenAI-compatible chat-completion request to the selected free model.
-4. Prints only the returned message to stdout, keeping shell pipelines clean.
-5. If the token has expired, performs a tiny Cline run to refresh it and retries once.
-
-This makes it useful for low-stakes transformations such as drafts, summaries of supplied text, brainstorming, and code sketches. It does not add search, citations, identity resolution, or fact checking.
-
-## Install `askcline`
-
-Authenticate the Cline CLI once:
-
-```bash
-cline auth cline
+```text
+raw prompt  -> Cline Chat Completions API -> text
+agent task  -> Cline CLI harness -> tools -> observations -> iterations -> result
+verify fact -> Cline CLI harness + evidence/abstention contract -> supported answer or refusal
 ```
 
-Install the wrapper:
+A model endpoint is not an agent, retrieval system, verifier, or evaluation harness.
+
+## Install
+
+Install and authenticate the official Cline CLI for `agent`, `verify`, and `doctor` modes. Create a Cline API key for `raw` mode.
 
 ```bash
 mkdir -p "$HOME/.local/bin"
@@ -55,24 +23,78 @@ chmod +x "$HOME/.local/bin/askcline"
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Then use it from any shell:
+## Use
+
+Raw completion for clean shell pipelines:
 
 ```bash
-askcline "What is the capital of France? One word."
-askcline "Summarize this:" "$(cat notes.txt)" | pbcopy
+export CLINE_API_KEY="..."
+askcline raw "Summarize this:" "$(cat notes.txt)"
 ```
 
-Requires the authenticated Cline CLI, `curl`, `jq`, and `python3`.
-
-## Preview the Pages site locally
+Full Cline coding-agent harness:
 
 ```bash
+askcline agent "Inspect this repository, run the tests, fix failures, and explain the diff"
+```
+
+Agent mode defaults to `--auto-approve false`. Enable approval only inside a controlled workspace.
+
+Evidence-oriented verification:
+
+```bash
+askcline verify "Who signed the Reykjavik Moon Cheese Accord?"
+```
+
+Verification mode asks Cline to disambiguate entities, retrieve evidence, cite what it inspected, separate inference, and abstain when evidence is insufficient. It also installs a restrictive command policy and tells the agent not to modify files.
+
+Check the setup:
+
+```bash
+askcline doctor
+```
+
+## What changed in v0.2
+
+- `raw`: supported `CLINE_API_KEY` authentication, current OpenAI-compatible response parsing, migration compatibility, retry handling, clean stdout/stderr, and nonzero failures.
+- `agent`: delegates to the official Cline CLI harness with JSON traces, workspace context, timeout, model selection, and safe approval defaults.
+- `verify`: uses the harness with an evidence and abstention contract plus restrictive command permissions.
+- `doctor`: checks local dependencies and configuration.
+- Deterministic tests cover API parsing, failures, private-token avoidance, and harness delegation.
+- Cross-platform GitHub Actions run the static tests, wrapper tests, Bash validation, and ShellCheck.
+- `.cline/rules/harness.md` preserves the architecture when Cline works on its own repository.
+- `evals/cases.jsonl` seeds repeated evaluations for false premises, ambiguous identity, transformations, and repository repair.
+
+## Evaluation
+
+```bash
+npm test
+```
+
+The tests verify:
+
+- current and legacy API response parsing;
+- errors never becoming successful stdout answers;
+- explicit API-key usage rather than private Cline token scraping;
+- safe delegation to the full Cline harness;
+- Bash syntax and the static GitHub Pages exhibit.
+
+## Boundaries
+
+- `raw` does not browse, execute tools, inspect a repository, verify claims, or continue a tool loop.
+- `agent` can execute tools; keep approval disabled unless the workspace is isolated and the task is understood.
+- `verify` improves process but cannot guarantee that a source is correct or complete.
+- The static GitHub Pages site never accepts credentials.
+- Fluent output is not evidence by itself.
+
+## Development
+
+```bash
+npm test
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000`.
-
-## Edit or render the film
+To edit or render the film:
 
 ```bash
 cd free-intelligence-film
@@ -81,8 +103,4 @@ npm run dev
 npx remotion render FreeIntelligenceReport out/free-intelligence-report.mp4
 ```
 
-The score is deterministic and can be regenerated with:
-
-```bash
-node scripts/generate-score.mjs public/newsroom-score.wav
-```
+Free describes the price. The harness determines much of the behavior. Neither replaces verification.
