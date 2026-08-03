@@ -26,15 +26,25 @@ test("the film is exactly 70 seconds and shares one visual source with poster an
   assert.match(source, /id="FreeIntelligenceOg"/);
 });
 
-test("the main CI workflow validates, renders, verifies, and commits media", async () => {
+test("the film package strips nondeterministic MP4 metadata", async () => {
+  const pkg = JSON.parse(await readFile(new URL("free-intelligence-film/package.json", root), "utf8"));
+  assert.match(pkg.scripts["normalize:film"], /map_metadata -1/);
+  assert.match(pkg.scripts["normalize:film"], /map_chapters -1/);
+  assert.match(pkg.scripts["normalize:film"], /fflags \+bitexact/);
+  assert.match(pkg.scripts["render:all"], /normalize:film/);
+});
+
+test("the main CI workflow renders, verifies, and proves byte reproducibility", async () => {
   const workflow = await readFile(new URL(".github/workflows/ci.yml", root), "utf8");
   assert.match(workflow, /render-film:/);
-  assert.match(workflow, /npm run lint/);
-  assert.match(workflow, /npm run render:all/);
   assert.match(workflow, /apt-get install -y ffmpeg/);
+  assert.match(workflow, /SOURCE_DATE_EPOCH: 0/);
+  assert.match(workflow, /npm run render:all/);
   assert.match(workflow, /ffprobe/);
   assert.match(workflow, /duration.*>= 69\.9.*<= 70\.1/);
   assert.match(workflow, /media-manifest\.json/);
+  assert.match(workflow, /Prove committed media is reproducible/);
+  assert.match(workflow, /git diff --exit-code/);
   assert.match(workflow, /git push origin/);
   assert.match(workflow, /\[rendered film\]/);
 });
