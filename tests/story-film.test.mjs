@@ -31,6 +31,7 @@ test("the main CI workflow validates, renders, verifies, and commits media", asy
   assert.match(workflow, /render-film:/);
   assert.match(workflow, /npm run lint/);
   assert.match(workflow, /npm run render:all/);
+  assert.match(workflow, /apt-get install -y ffmpeg/);
   assert.match(workflow, /ffprobe/);
   assert.match(workflow, /duration.*>= 69\.9.*<= 70\.1/);
   assert.match(workflow, /media-manifest\.json/);
