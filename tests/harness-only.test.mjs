@@ -42,7 +42,7 @@ test("documentation and the public site describe one harness architecture", asyn
 
 test("the root package contains no dormant application runtime", async () => {
   const pkg = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
-  assert.equal(pkg.version, "1.1.0");
+  assert.equal(pkg.version, "1.1.1");
   assert.deepEqual(pkg.dependencies ?? {}, {});
   assert.deepEqual(pkg.devDependencies ?? {}, {});
   assert.deepEqual(Object.keys(pkg.scripts), ["test"]);
