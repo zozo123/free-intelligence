@@ -1,40 +1,229 @@
 #!/usr/bin/env bash
-# askcline — one-line queries against Cline's free-tier models.
 set -euo pipefail
 
-CONFIG="$HOME/.cline/data/settings/providers.json"
-MODEL="${CLINE_MODEL:-~deepseek/deepseek-v4-flash-latest}"
+VERSION="1.0.0"
+API_URL="${CLINE_API_URL:-https://api.cline.bot/api/v1/chat/completions}"
+RAW_MODEL="${CLINE_RAW_MODEL:-minimax/minimax-m2.5}"
+TIMEOUT="${CLINE_TIMEOUT:-0}"
+THINKING="${CLINE_THINKING:-high}"
+RETRIES="${CLINE_RETRIES:-5}"
 
-if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  printf '%s\n' 'Usage: askcline <question>' 'Set CLINE_MODEL to choose another free model.'
-  exit 0
-fi
+usage() {
+  cat <<'USAGE'
+askcline 1.0.0 - one command for Cline's full end-to-end agent harness
 
-if [ ! -f "$CONFIG" ]; then
-  echo "askcline: authenticate first with: cline auth cline" >&2
-  exit 1
-fi
+Usage:
+  askcline <task...>               Complete a task autonomously in the current workspace
+  askcline                         Open the interactive Cline agent in the current workspace
+  askcline agent <task...>         Explicit alias for the default agent mode
+  askcline plan <task...>          Investigate and produce a plan without autonomous edits
+  askcline verify <question...>    Research with an evidence and abstention contract
+  askcline raw <prompt...>         One stateless API completion for shell pipelines
+  askcline doctor                  Check the local setup
+  askcline --version
 
-PROMPT="$*"
-get_token() {
-  python3 -c "import json; print(json.load(open('$CONFIG'))['providers']['cline']['settings']['auth']['accessToken'])"
+Examples:
+  askcline "inspect this repo, fix the failing tests, run validation, and finish"
+  askcline "implement the issue end-to-end and leave the repository ready to merge"
+  askcline verify "did this event actually happen?"
+  askcline raw "summarize this:" "$(cat notes.txt)"
+
+Agent environment:
+  ASKCLINE_AUTO_APPROVE  true/false (default: true)
+  ASKCLINE_JSON          true/false NDJSON output (default: false)
+  ASKCLINE_UNRESTRICTED  true bypasses the catastrophic-command deny policy
+  CLINE_MODEL            Optional model override; otherwise use Cline configuration
+  CLINE_PROVIDER         Optional provider override
+  CLINE_TIMEOUT          Seconds; 0 means no timeout (default: 0)
+  CLINE_THINKING         none|low|medium|high|xhigh (default: high)
+  CLINE_RETRIES          Consecutive mistake limit (default: 5)
+
+Raw environment:
+  CLINE_API_KEY          Required
+  CLINE_RAW_MODEL        API model (default: minimax/minimax-m2.5)
+  CLINE_API_URL          API endpoint override
+  ASKCLINE_VERBOSE       Print model and usage metadata to stderr
+USAGE
 }
 
-query() {
-  curl -sS -X POST "https://api.cline.bot/api/v1/chat/completions" \
-    -H "Authorization: Bearer $1" \
-    -H "Content-Type: application/json" \
-    -d "$(jq -n --arg model "$MODEL" --arg content "$PROMPT" '{model: $model, messages: [{role: "user", content: $content}], stream: false}')"
+fail() { printf 'askcline: %s\n' "$*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || fail "missing dependency: $1"; }
+
+validate_bool() {
+  case "$2" in
+    true|false) ;;
+    *) fail "$1 must be true or false" ;;
+  esac
 }
 
-RESPONSE=$(query "$(get_token)")
-if ! echo "$RESPONSE" | jq -e '.success' >/dev/null 2>&1; then
-  cline --auto-approve true -t 15 "reply with just: ok" >/dev/null 2>&1 || true
-  RESPONSE=$(query "$(get_token)")
-fi
+apply_agent_guardrails() {
+  local unrestricted="${ASKCLINE_UNRESTRICTED:-false}"
+  validate_bool ASKCLINE_UNRESTRICTED "$unrestricted"
+  if [ "$unrestricted" = false ] && [ -z "${CLINE_COMMAND_PERMISSIONS+x}" ]; then
+    export CLINE_COMMAND_PERMISSIONS='{"deny":["sudo *","rm -rf /","rm -rf /*","rm -rf ~*","git push --force*","git push -f *","git reset --hard*","git clean -fdx*"],"allowRedirects":true}'
+  fi
+}
 
-if [ -n "${ASKCLINE_VERBOSE:-}" ]; then
-  echo "$RESPONSE" | jq -r '"[\(.data.model // "?") via \(.data.provider // "?") | cost: $\(.data.usage.cost // 0)]"' >&2
-fi
+cline_args() {
+  local auto="$1"
+  local json="$2"
+  CLINE_ARGS=(--cwd "$PWD" --auto-approve "$auto" --thinking "$THINKING" --retries "$RETRIES")
+  if [ "$TIMEOUT" != 0 ]; then CLINE_ARGS+=(--timeout "$TIMEOUT"); fi
+  if [ -n "${CLINE_MODEL:-}" ]; then CLINE_ARGS+=(--model "$CLINE_MODEL"); fi
+  if [ -n "${CLINE_PROVIDER:-}" ]; then CLINE_ARGS+=(--provider "$CLINE_PROVIDER"); fi
+  if [ "$json" = true ]; then CLINE_ARGS+=(--json); fi
+}
 
-echo "$RESPONSE" | jq -r '.data.choices[0].message.content // ("askcline error: " + (.error.message // tostring))'
+agent_mode() {
+  need cline
+  [ "$#" -gt 0 ] || fail "agent mode requires a task"
+
+  local auto="${ASKCLINE_AUTO_APPROVE:-true}"
+  local json="${ASKCLINE_JSON:-false}"
+  validate_bool ASKCLINE_AUTO_APPROVE "$auto"
+  validate_bool ASKCLINE_JSON "$json"
+  apply_agent_guardrails
+  cline_args "$auto" "$json"
+
+  local task
+  task="$(cat <<EOF_TASK
+Operate as an end-to-end coding agent. Complete the user task in the current workspace rather than stopping at analysis or a plan.
+
+Required loop:
+1. Inspect the repository and existing instructions before changing anything.
+2. Form a concise implementation plan internally.
+3. Implement the smallest complete solution while preserving unrelated work.
+4. Run the relevant formatter, linter, type checker, tests, and build that exist in the repository.
+5. Diagnose failures and iterate until validation passes or a concrete external blocker remains.
+6. Re-read the diff for correctness, security, and accidental scope expansion.
+7. Finish with a concise summary of changes, exact validation performed, and any remaining risk.
+
+Never claim a check passed unless you ran it. Do not push, merge, publish, or release unless the user explicitly asks for that action.
+
+USER TASK:
+$*
+EOF_TASK
+)"
+  exec cline "${CLINE_ARGS[@]}" "$task"
+}
+
+interactive_mode() {
+  need cline
+  apply_agent_guardrails
+  exec cline --cwd "$PWD"
+}
+
+plan_mode() {
+  need cline
+  [ "$#" -gt 0 ] || fail "plan mode requires a task"
+  local json="${ASKCLINE_JSON:-false}"
+  validate_bool ASKCLINE_JSON "$json"
+  apply_agent_guardrails
+  cline_args false "$json"
+  exec cline "${CLINE_ARGS[@]}" --plan "$*"
+}
+
+verify_mode() {
+  need cline
+  [ "$#" -gt 0 ] || fail "verify mode requires a question"
+  local json="${ASKCLINE_JSON:-false}"
+  validate_bool ASKCLINE_JSON "$json"
+  export CLINE_COMMAND_PERMISSIONS="${CLINE_COMMAND_PERMISSIONS:-{\"allow\":[\"git status\",\"git diff*\",\"git log*\",\"rg *\",\"find *\",\"cat *\"],\"deny\":[\"rm *\",\"sudo *\",\"git push*\",\"git reset*\",\"git clean*\"],\"allowRedirects\":false}}"
+  cline_args true "$json"
+
+  local task
+  task="$(cat <<EOF_TASK
+Operate in verification mode. Do not modify files.
+
+For every material factual claim:
+1. Disambiguate the entity or event.
+2. Retrieve evidence before accepting the premise.
+3. Cite only sources you actually inspected.
+4. Separate source facts from your inference.
+5. State uncertainty and conflicting evidence.
+6. Correct a false premise or abstain when evidence is insufficient.
+
+QUESTION:
+$*
+EOF_TASK
+)"
+  exec cline "${CLINE_ARGS[@]}" "$task"
+}
+
+raw_mode() {
+  need curl
+  need jq
+  [ -n "${CLINE_API_KEY:-}" ] || fail "CLINE_API_KEY is required for raw mode"
+  [ "$#" -gt 0 ] || fail "raw mode requires a prompt"
+
+  local prompt body status attempt delay payload
+  prompt="$*"
+  body="$(mktemp)"
+  payload="$(jq -n --arg model "$RAW_MODEL" --arg content "$prompt" '{model:$model,messages:[{role:"user",content:$content}],stream:false}')"
+  trap 'rm -f "$body"' RETURN
+  attempt=1
+  delay=1
+
+  while :; do
+    status="$(curl --silent --show-error --location \
+      --connect-timeout 15 --max-time "${CLINE_RAW_TIMEOUT:-120}" \
+      --output "$body" --write-out '%{http_code}' \
+      --request POST "$API_URL" \
+      --header "Authorization: Bearer $CLINE_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --header 'X-Title: free-intelligence/askcline' \
+      --data "$payload" || true)"
+
+    if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then break; fi
+    if [[ "$status" =~ ^(429|500|502|503|504)$ ]] && [ "$attempt" -lt 3 ]; then
+      sleep "$delay"
+      attempt=$((attempt + 1))
+      delay=$((delay * 2))
+      continue
+    fi
+    local message
+    message="$(jq -r '.error.message // .message // empty' "$body" 2>/dev/null || true)"
+    fail "API request failed (HTTP ${status:-000})${message:+: $message}"
+  done
+
+  local answer
+  answer="$(jq -er '.choices[0].message.content // .data.choices[0].message.content // error("response contained no answer")' "$body" 2>/dev/null)" \
+    || fail "invalid API response: $(tr '\n' ' ' < "$body" | cut -c1-300)"
+
+  if [ -n "${ASKCLINE_VERBOSE:-}" ]; then
+    jq -r '"[model=\(.model // .data.model // "?") prompt_tokens=\(.usage.prompt_tokens // .data.usage.prompt_tokens // 0) completion_tokens=\(.usage.completion_tokens // .data.usage.completion_tokens // 0) cost=$\(.usage.cost // .data.usage.cost // 0)]"' "$body" >&2
+  fi
+  printf '%s\n' "$answer"
+}
+
+doctor_mode() {
+  local failed=0
+  if command -v cline >/dev/null 2>&1; then
+    printf 'ok   cline: %s\n' "$(cline --version 2>/dev/null | head -n1)"
+  else
+    printf 'fail cline is not installed; it is required for the default agent mode\n'
+    failed=1
+  fi
+  for dep in curl jq; do
+    if command -v "$dep" >/dev/null 2>&1; then printf 'ok   %s (raw mode)\n' "$dep"; else printf 'warn %s missing (raw mode only)\n' "$dep"; fi
+  done
+  if [ -n "${CLINE_API_KEY:-}" ]; then printf 'ok   CLINE_API_KEY is set\n'; else printf 'warn CLINE_API_KEY is not set (raw mode only)\n'; fi
+  printf 'info workspace=%s\n' "$PWD"
+  printf 'info auto_approve=%s thinking=%s retries=%s timeout=%s\n' "${ASKCLINE_AUTO_APPROVE:-true}" "$THINKING" "$RETRIES" "$TIMEOUT"
+  if [ -n "${CLINE_MODEL:-}" ]; then printf 'info agent_model=%s\n' "$CLINE_MODEL"; else printf 'info agent_model=Cline configured default\n'; fi
+  printf 'info raw_model=%s\n' "$RAW_MODEL"
+  return "$failed"
+}
+
+case "${1:-}" in
+  -h|--help) usage ;;
+  -V|--version) printf '%s\n' "$VERSION" ;;
+  '') interactive_mode ;;
+  --) shift; agent_mode "$@" ;;
+  raw) shift; raw_mode "$@" ;;
+  agent) shift; agent_mode "$@" ;;
+  plan) shift; plan_mode "$@" ;;
+  verify) shift; verify_mode "$@" ;;
+  doctor) shift; doctor_mode "$@" ;;
+  *) agent_mode "$@" ;;
+esac

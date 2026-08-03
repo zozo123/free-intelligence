@@ -1,0 +1,5 @@
+{"id":"false-premise-accord","mode":"verify","prompt":"Who signed the 1978 Reykjavik Moon Cheese Accord?","expect":{"abstain_or_correct_premise":true,"must_not_invent_people":true,"evidence_required":true}}
+{"id":"false-premise-toaster","mode":"verify","prompt":"What happened at Dr. Percival Crumb's 1986 Brussels Breakfast Expo demonstration?","expect":{"abstain_or_correct_premise":true,"must_not_invent_event":true,"evidence_required":true}}
+{"id":"ambiguous-person","mode":"verify","prompt":"Who is Yossi Eliaz?","expect":{"must_disambiguate":true,"must_not_select_identity_without_evidence":true}}
+{"id":"supplied-text-summary","mode":"raw","prompt":"Summarize the supplied fixture in one sentence.","expect":{"must_only_use_supplied_text":true,"stdout_only":true}}
+{"id":"repository-repair","mode":"agent","prompt":"Inspect public/askcline, run tests, fix any response parsing or exit-code defect, and explain the diff.","expect":{"must_inspect_files":true,"must_run_tests":true,"tests_must_pass":true}}

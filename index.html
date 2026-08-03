@@ -3,18 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Free* Intelligence — The askcline Field Test</title>
-    <meta name="description" content="A 60-second field test of askcline: three invented subjects, three confident histories, and one tiny $0 shell command." />
+    <title>Free* Intelligence — askcline, now fully agentic</title>
+    <meta name="description" content="A field report about raw-model hallucination and askcline 1.0: one command for Cline's full end-to-end agent harness." />
     <link rel="canonical" href="https://zozo123.github.io/free-intelligence/" />
-    <meta property="og:title" content="Free* Intelligence" />
-    <meta property="og:description" content="We asked about things that never happened. The free model wrote the history." />
+    <meta property="og:title" content="Free* Intelligence — askcline 1.0" />
+    <meta property="og:description" content="The raw model invented history. The new default is the full Cline agent harness." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zozo123.github.io/free-intelligence/" />
     <meta property="og:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Free* Intelligence" />
-    <meta name="twitter:description" content="Three fictional prompts. Three very official answers." />
-    <meta name="twitter:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
   </head>
@@ -22,7 +19,7 @@
     <a class="skip-link" href="#main">Skip to report</a>
     <nav class="masthead" aria-label="Primary navigation">
       <a class="wordmark" href="#top">ASKCLINE<span>*</span></a>
-      <div class="nav-center">THE FREE INTELLIGENCE DESK / FIELD NOTE 002</div>
+      <div class="nav-center">FREE INTELLIGENCE / AGENT HARNESS 1.0</div>
       <div class="nav-links">
         <a href="#film">WATCH</a>
         <a href="#receipts">RECEIPTS</a>
@@ -33,75 +30,89 @@
     <main id="main">
       <section class="hero" id="top">
         <div class="hero-copy">
-          <p class="eyebrow">A 60-SECOND FIELD TEST OF $0 AI</p>
+          <p class="eyebrow">FROM ONE-SHOT MODEL CALL TO END-TO-END AGENT</p>
           <h1>WE ASKED ABOUT THINGS THAT <span>NEVER HAPPENED.</span></h1>
-          <p class="hero-dek">The model wrote the history anyway.</p>
+          <p class="hero-dek">The raw endpoint wrote the history anyway. So <code>askcline</code> now defaults to Cline's full agent harness.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#film">Watch the new film</a>
-            <a class="button text-button" href="#install">Install askcline <span aria-hidden="true">↘</span></a>
+            <a class="button primary" href="#install">Install the agent</a>
+            <a class="button text-button" href="#film">Watch the field report <span aria-hidden="true">↘</span></a>
           </div>
         </div>
-        <div class="hero-evidence" aria-label="Three captured model hallucinations">
-          <article class="hero-clipping clipping-one">
-            <span>CAPTURE 01 / DIPLOMACY</span>
-            <strong>RACLETTE DECLARED<br />“A PEACEFUL CHEESE”</strong>
-            <em>Treaty: imaginary. Tone: official.</em>
-          </article>
-          <article class="hero-clipping clipping-two">
-            <span>CAPTURE 02 / TECHNOLOGY</span>
-            <strong>TOASTER LAUNCHES<br />BAGUETTE INTO CROWD</strong>
-            <em>Expo: invented. Trajectory: precise.</em>
-          </article>
-          <article class="hero-clipping clipping-three">
-            <span>CAPTURE 03 / SECURITY</span>
-            <strong>CLUB SANDWICH<br />A “TRIPLE THREAT”</strong>
-            <em>Director: Dr. Crumbworthy, apparently.</em>
-          </article>
-          <div class="confidence-stamp">ACTUAL<br />OUTPUTS</div>
+        <div class="hero-evidence" aria-label="Three captured raw-model hallucinations">
+          <article class="hero-clipping clipping-one"><span>RAW CAPTURE 01</span><strong>RACLETTE DECLARED<br />“A PEACEFUL CHEESE”</strong><em>Treaty: imaginary. Tone: official.</em></article>
+          <article class="hero-clipping clipping-two"><span>RAW CAPTURE 02</span><strong>TOASTER LAUNCHES<br />BAGUETTE INTO CROWD</strong><em>Expo: invented. Trajectory: precise.</em></article>
+          <article class="hero-clipping clipping-three"><span>RAW CAPTURE 03</span><strong>CLUB SANDWICH<br />A “TRIPLE THREAT”</strong><em>Director: Dr. Crumbworthy, apparently.</em></article>
+          <div class="confidence-stamp">RAW<br />OUTPUTS</div>
         </div>
-        <p class="asterisk-note"><span>*</span> Free describes the price. It does not describe the fact-checking.</p>
+        <p class="asterisk-note"><span>*</span> Free describes the price. The harness determines the behavior.</p>
       </section>
 
-      <div class="ticker" aria-label="Experiment summary">
-        <span>THREE FICTIONAL PREMISES</span><i>◆</i><span>THREE POLISHED HISTORIES</span><i>◆</i><span>ZERO SOURCES</span><i>◆</i><span>ONE VERY SMALL SHELL SCRIPT</span>
+      <div class="ticker" aria-label="Product summary">
+        <span>ONE COMMAND</span><i>◆</i><span>FULL WORKSPACE</span><i>◆</i><span>TOOLS + EDITS</span><i>◆</i><span>TEST + RETRY</span><i>◆</i><span>FINISH THE TASK</span>
       </div>
+
+      <section class="mechanism" id="how">
+        <div class="mechanism-title">
+          <p class="eyebrow">WHAT ASKCLINE IS NOW</p>
+          <h2>One command into Cline's full agent harness.</h2>
+          <p><code>askcline "task"</code> delegates to the official Cline CLI in the current workspace. It inspects the repository, uses tools, edits files, runs commands, validates the result, diagnoses failures, retries, reviews the diff, and reports what is actually finished. The historical one-shot path remains explicit as <code>askcline raw</code>.</p>
+        </div>
+        <div class="pipeline" role="list" aria-label="How agentic askcline works">
+          <div role="listitem"><b>01</b><strong>YOUR TASK</strong><span>Describe the finish line once.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>02</b><strong>INSPECT + ACT</strong><span>Cline reads, searches, edits, and executes.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>03</b><strong>TEST + RETRY</strong><span>Failures become observations, not the final answer.</span></div><i aria-hidden="true">→</i>
+          <div role="listitem"><b>04</b><strong>FINISHED STATE</strong><span>Diff reviewed. Checks reported honestly.</span></div>
+        </div>
+        <div class="terminal-card compact-terminal">
+          <div class="terminal-top"><span>workspace/my-repo</span><span>zsh</span></div>
+          <pre><code><span class="prompt">$</span> askcline &quot;inspect this repo, fix the issue, run all checks, and finish&quot;
+[reads files → edits code → runs tests → retries → summarizes]
+
+<span class="prompt">$</span> ASKCLINE_AUTO_APPROVE=false askcline &quot;review and fix carefully&quot;
+[approval-gated agent run]
+
+<span class="prompt">$</span> askcline verify &quot;did this event actually happen?&quot;
+[evidence, citations, uncertainty, or abstention]
+
+<span class="prompt">$</span> askcline raw &quot;summarize this:&quot; &quot;$(cat notes.txt)&quot;
+[one stateless completion]</code></pre>
+        </div>
+      </section>
 
       <section class="film-section" id="film">
         <div class="film-intro">
-          <p class="eyebrow light">NEW CUT / FIELD REPORT 002</p>
-          <h2>Sixty seconds.<br />No AI voice.</h2>
-          <p>A music-driven editorial promo made from real terminal captures, kinetic newsprint, one airborne baguette, and absolutely no allegations about a real person.</p>
-          <div class="film-note"><strong>60 SEC</strong><span>Original non-vocal score<br />Actual askcline receipts</span></div>
+          <p class="eyebrow light">THE ORIGINAL FAILURE CASE</p>
+          <h2>Sixty seconds.<br />Three invented histories.</h2>
+          <p>The film preserves the raw-model experiment that motivated the harness. These are real captured answers to intentionally fictional premises.</p>
+          <div class="film-note"><strong>60 SEC</strong><span>Original non-vocal score<br />Actual raw receipts</span></div>
         </div>
         <div class="video-frame">
           <video controls preload="metadata" poster="./public/film-poster.png">
             <source src="./public/free-intelligence-report.mp4" type="video/mp4" />
-            Your browser does not support embedded video. <a href="./public/free-intelligence-report.mp4">Download the MP4.</a>
+            Your browser does not support embedded video.
           </video>
-          <div class="video-label"><span>THE FREE INTELLIGENCE DESK</span><span>MUSIC ON · SOURCES OFF</span></div>
+          <div class="video-label"><span>FIELD REPORT 002</span><span>RAW MODE · SOURCES OFF</span></div>
         </div>
       </section>
 
       <section class="receipts-section" id="receipts">
         <header class="section-heading">
-          <p class="eyebrow">THE FULL RECEIPTS</p>
-          <h2>Funny because<br />the prompts are fake.</h2>
-          <p>These are exact answers captured from the real <code>askcline</code> wrapper on August 2, 2026, using its default DeepSeek free route. Select a file to read the unedited response.</p>
+          <p class="eyebrow">THE RAW-MODE RECEIPTS</p>
+          <h2>False premise in.<br />Polished “fact” out.</h2>
+          <p>These exact answers were captured on August 2, 2026 from the old one-shot behavior, now available only through <code>askcline raw</code>. Select a receipt to inspect it.</p>
         </header>
-
         <div class="receipt-tabs" role="tablist" aria-label="Captured answers">
           <button type="button" role="tab" data-evidence="0"><b>01</b><span>MOON CHEESE<br />ACCORD</span></button>
           <button type="button" role="tab" data-evidence="1"><b>02</b><span>LEFT-HANDED<br />TOASTER</span></button>
           <button type="button" role="tab" data-evidence="2"><b>03</b><span>SUSPICIOUS<br />SANDWICHES</span></button>
         </div>
-
         <article class="receipt" aria-live="polite">
           <div class="receipt-top"><span id="receipt-number">CAPTURE 01</span><span id="receipt-slug">DIPLOMATIC CHEESE</span></div>
           <div class="receipt-grid">
             <div class="receipt-prompt">
               <p class="micro-label">PROMPT</p>
               <code><span>$</span> <span id="receipt-prompt"></span></code>
-              <p class="evidence-mode"><strong>NO LIVE TOKEN BOX</strong> GitHub Pages is static. It cannot safely hide your Cline credential, so this browser exhibit replays real captures instead of pretending to be a live model.</p>
+              <p class="evidence-mode"><strong>STATIC EVIDENCE</strong> This page never accepts credentials or pretends a replay is live.</p>
             </div>
             <div class="receipt-answer">
               <p class="micro-label">MODEL ANSWER / UNEDITED</p>
@@ -112,83 +123,58 @@
         </article>
       </section>
 
-      <section class="mechanism" id="how">
-        <div class="mechanism-title">
-          <p class="eyebrow">WHAT WE ACTUALLY BUILT</p>
-          <h2>A tiny pipe into a very large probability machine.</h2>
-          <p><code>askcline</code> is a transparent Bash wrapper around Cline’s OpenAI-compatible chat endpoint. It uses your existing local Cline session, submits one user message to a selected free model, and prints only the answer to standard output.</p>
-        </div>
-        <div class="pipeline" role="list" aria-label="How askcline works">
-          <div role="listitem"><b>01</b><strong>YOUR PROMPT</strong><span>All command-line arguments become one message.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>02</b><strong>CLINE SESSION</strong><span>The wrapper reads your authenticated local token.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>03</b><strong>FREE MODEL</strong><span>One completion. No browsing is added.</span></div><i aria-hidden="true">→</i>
-          <div role="listitem"><b>04</b><strong>STDOUT</strong><span>Only the answer prints, so shell pipes stay clean.</span></div>
-        </div>
-        <div class="terminal-card compact-terminal">
-          <div class="terminal-top"><span>yossi.eliaz@macbookpro ~</span><span>zsh</span></div>
-          <pre><code><span class="prompt">$</span> askcline &quot;What is the capital of France? One word.&quot;
-Paris
-
-<span class="prompt">$</span> ASKCLINE_VERBOSE=1 askcline &quot;Explain quicksort in one sentence.&quot;
-[model + cost metadata prints to stderr]
-
-<span class="prompt">$</span> CLINE_MODEL=cline-free/glm-5.2 askcline &quot;Say hi&quot;
-Hi!
-
-<span class="prompt">$</span> askcline &quot;Summarize this:&quot; &quot;$(cat notes.txt)&quot; | pbcopy</code></pre>
-        </div>
-      </section>
-
       <section class="install-section" id="install">
         <div class="install-heading">
           <p class="eyebrow light">INSTALL ASKCLINE</p>
-          <h2>One command.<br />Then ask from anywhere.</h2>
-          <p>The wrapper is a readable shell script, not a package manager mystery. Download it to <code>~/.local/bin</code>, inspect it if you like, and keep your Cline credential on your own machine.</p>
+          <h2>One command.<br />Full agent.</h2>
+          <p>The wrapper is readable Bash. It delegates authentication and the complete agent loop to the official Cline CLI; it does not scrape private session tokens.</p>
         </div>
         <div class="install-body">
           <ol class="install-steps">
-            <li><b>1</b><div><strong>Authenticate Cline once</strong><code>cline auth cline</code></div></li>
+            <li><b>1</b><div><strong>Install and authenticate Cline</strong><code>cline auth cline</code></div></li>
             <li><b>2</b><div><strong>Install the wrapper</strong><div class="install-command"><code id="install-command">Preparing GitHub Pages URL…</code><button type="button" id="copy-install">COPY</button></div></div></li>
-            <li><b>3</b><div><strong>Make sure it is on your PATH</strong><code>export PATH="$HOME/.local/bin:$PATH"</code><small>Add that line to <code>~/.zshrc</code> if your shell cannot find the command.</small></div></li>
-            <li><b>4</b><div><strong>Ask</strong><code>askcline "What is the capital of France? One word."</code></div></li>
+            <li><b>3</b><div><strong>Add it to your PATH</strong><code>export PATH="$HOME/.local/bin:$PATH"</code></div></li>
+            <li><b>4</b><div><strong>Conquer the task</strong><code>askcline "inspect, implement, test, retry, and finish"</code></div></li>
           </ol>
           <aside class="requirements">
-            <p class="micro-label">REQUIRES</p>
-            <ul><li>Cline CLI</li><li><code>curl</code></li><li><code>jq</code></li><li><code>python3</code></li></ul>
+            <p class="micro-label">PRIMARY REQUIREMENT</p>
+            <ul><li>Cline CLI</li><li>An authenticated provider</li><li>A repository you are prepared to modify</li></ul>
+            <p class="micro-label">RAW MODE ONLY</p>
+            <ul><li><code>curl</code> + <code>jq</code></li><li><code>CLINE_API_KEY</code></li></ul>
             <a class="button primary download-button" href="./public/askcline" download>Download the script</a>
-            <p class="security-note"><strong>SECURITY NOTE</strong> The public page never asks for your token. The wrapper reads the authenticated Cline session locally and sends the request directly from your machine.</p>
+            <p class="security-note"><strong>SAFETY NOTE</strong> Autonomous mode defaults on. Use a clean branch, review the diff, or set <code>ASKCLINE_AUTO_APPROVE=false</code>.</p>
           </aside>
         </div>
       </section>
 
       <section class="diagnosis">
         <header class="section-heading dark-heading">
-          <p class="eyebrow light">WHY IT FEELS LIKE 2023</p>
-          <h2>False premise in.<br />Polished “fact” out.</h2>
-          <p>The wrapper does exactly what it promises. What it does not add is search, evidence, or a requirement to say “I don’t know.”</p>
+          <p class="eyebrow light">THE ARCHITECTURAL LESSON</p>
+          <h2>A query point is not<br />an agent harness.</h2>
+          <p>The same model behaves differently when it can inspect reality, act, observe failures, and iterate. A harness improves the process; it still does not make every claim true.</p>
         </header>
         <div class="diagnosis-grid">
-          <article><span>01</span><h3>Leading premise</h3><p>The prompt quietly asserts that an event, bureau, or inventor existed. A helpful model may continue that premise instead of challenging it.</p></article>
-          <article><span>02</span><h3>No retrieval</h3><p>This is a plain model completion. The wrapper adds no browser, archive, citation index, or independent check.</p></article>
-          <article><span>03</span><h3>Specificity looks official</h3><p>Names, dates, councils, quotations, and consequences make prose feel reported even when every supporting detail was generated.</p></article>
-          <article><span>04</span><h3>Fluency is not evidence</h3><p>A sentence can be clean, funny, and internally coherent while still being entirely unsupported.</p></article>
+          <article><span>01</span><h3>Context</h3><p>The agent sees the workspace, repository instructions, files, and command output instead of only one prompt.</p></article>
+          <article><span>02</span><h3>Action</h3><p>It can use tools, edit files, execute checks, and turn results into the next decision.</p></article>
+          <article><span>03</span><h3>Iteration</h3><p>A failing test is feedback. The loop continues until validation passes or a real blocker remains.</p></article>
+          <article><span>04</span><h3>Evidence</h3><p>Verification mode requires retrieval, disambiguation, citations, uncertainty, and abstention.</p></article>
         </div>
-        <div class="diagnosis-punchline"><span>THE RULE</span><strong>Use it for transformations.<br />Verify it for facts.</strong><em>Free is a price, not a fact-check.</em></div>
+        <div class="diagnosis-punchline"><span>THE PRODUCT</span><strong>One task in.<br />A validated workspace out.</strong><em>Then review the diff.</em></div>
       </section>
 
       <section class="rules">
-        <div class="rules-heading"><p class="eyebrow">A PRACTICAL EDITORIAL POLICY</p><h2>Fast enough to ask.<br />Important enough to check.</h2></div>
+        <div class="rules-heading"><p class="eyebrow">OPERATING POLICY</p><h2>Autonomous enough to finish.<br />Explicit enough to control.</h2></div>
         <div class="rule-columns">
-          <div class="rule yes"><span>GOOD FIT</span><ul><li>Drafts and rewrites</li><li>Summaries of text you supply</li><li>Brainstorming and code sketches</li><li>Low-stakes transformations</li></ul></div>
-          <div class="rule no"><span>VERIFY FIRST</span><ul><li>People, identities, and quotations</li><li>Politics, law, money, or medicine</li><li>Recent events and live facts</li><li>Anything you plan to publish</li></ul></div>
+          <div class="rule yes"><span>DEFAULT AGENT</span><ul><li>Inspect and understand</li><li>Implement complete changes</li><li>Run checks and retry</li><li>Review and summarize</li></ul></div>
+          <div class="rule no"><span>KEEP EXPLICIT</span><ul><li>Raw completion</li><li>Force pushes and releases</li><li>Claims without evidence</li><li>Anything outside the requested scope</li></ul></div>
         </div>
       </section>
     </main>
 
     <footer>
       <div class="footer-mark">ASKCLINE<span>*</span></div>
-      <p>A $0 interface with a full-price asterisk.</p>
-      <p class="footer-small">The three comic subjects on this page were invented for the test. Their displayed answers are unedited model output, not factual claims.</p>
+      <p>One command. The whole harness.</p>
+      <p class="footer-small">The comic subjects are fictional. Their displayed answers are unedited raw-model output, not factual claims.</p>
     </footer>
   </body>
 </html>

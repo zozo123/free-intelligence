@@ -1,78 +1,121 @@
 # Free* Intelligence
 
-A static GitHub Pages field report about `askcline`: a tiny Bash wrapper that sends a one-shot prompt to Cline’s free-model chat endpoint and prints only the answer to stdout.
+**`askcline "task"` is now one command for Cline's full end-to-end agent harness.**
 
-Field Note 002 uses three intentionally fictional prompts: the Reykjavik Moon Cheese Accord, Dr. Percival Crumb’s left-handed toaster, and the International Bureau of Suspicious Sandwiches. The displayed answers were captured from the real wrapper, unedited. They show how readily a leading false premise can become polished, source-free history.
+The original field report showed what happens when a raw model endpoint receives a leading false premise: it can return fluent, unsupported history. Version 1.0 keeps that raw path explicit, but makes the harness the product:
 
-## What is included
-
-- A no-install, static evidence exhibit that transparently replays the three captured answers.
-- The downloadable `askcline` Bash wrapper.
-- A 60-second Remotion report with an original non-vocal score, sound design, and editorial newsprint motion graphics.
-- A complete installation guide, terminal examples, and the one-line prompt-to-stdout mechanism.
-- A practical explanation of the failure mode: leading premise, no retrieval, no source contract, and fluent specificity.
-
-The public site intentionally does not accept Cline credentials. GitHub Pages has no private server, and an access token should never be embedded in a static site.
-
-## GitHub Pages
-
-The deployable site is the repository root:
-
-- `index.html`
-- `styles.css`
-- `app.js`
-- `public/free-intelligence-report.mp4`
-- `public/film-poster.png`
-- `public/og.png`
-- `public/askcline`
-
-GitHub Pages publishes directly from the `main` branch root.
-
-## How `askcline` works
-
-1. Joins the command-line arguments into one prompt.
-2. Reads the access token from an existing authenticated Cline CLI session.
-3. Sends one OpenAI-compatible chat-completion request to the selected free model.
-4. Prints only the returned message to stdout, keeping shell pipelines clean.
-5. If the token has expired, performs a tiny Cline run to refresh it and retries once.
-
-This makes it useful for low-stakes transformations such as drafts, summaries of supplied text, brainstorming, and code sketches. It does not add search, citations, identity resolution, or fact checking.
-
-## Install `askcline`
-
-Authenticate the Cline CLI once:
-
-```bash
-cline auth cline
+```text
+askcline "task"
+  -> inspect workspace
+  -> use Cline tools
+  -> edit and execute
+  -> run tests/build
+  -> diagnose and retry
+  -> review the diff
+  -> report the finished result
 ```
 
-Install the wrapper:
+A model call produces text. A harness turns the model into an agent.
+
+## Install
+
+Install and authenticate the official Cline CLI, then install the transparent wrapper:
 
 ```bash
+cline auth
 mkdir -p "$HOME/.local/bin"
 curl -fsSL https://zozo123.github.io/free-intelligence/public/askcline -o "$HOME/.local/bin/askcline"
 chmod +x "$HOME/.local/bin/askcline"
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Then use it from any shell:
+## One command
+
+Run it from the repository you want Cline to own end-to-end:
 
 ```bash
-askcline "What is the capital of France? One word."
-askcline "Summarize this:" "$(cat notes.txt)" | pbcopy
+cd my-repository
+askcline "inspect the repo, implement the issue, run every relevant check, fix failures, and leave it ready to merge"
 ```
 
-Requires the authenticated Cline CLI, `curl`, `jq`, and `python3`.
+A plain task is the autonomous agent mode. It defaults to:
 
-## Preview the Pages site locally
+- the current workspace;
+- Act mode with tool auto-approval enabled;
+- high reasoning effort;
+- five consecutive-mistake retries;
+- no artificial task timeout;
+- an explicit inspect -> implement -> validate -> retry -> review -> summarize loop;
+- a small deny policy for catastrophic host and force-push commands.
+
+The wrapper does not force a model. It uses the model and provider configured in Cline unless `CLINE_MODEL` or `CLINE_PROVIDER` is supplied.
+
+## Other modes
+
+```bash
+# Open Cline interactively in the current directory
+askcline
+
+# Same full agent path, written explicitly
+askcline agent "fix the tests and finish"
+
+# Investigate without autonomous edits
+askcline plan "design the migration"
+
+# Evidence-oriented research and abstention
+askcline verify "Did this event actually happen?"
+
+# The old one-shot completion path, now explicit
+export CLINE_API_KEY="..."
+askcline raw "Summarize this:" "$(cat notes.txt)"
+
+# Validate the installation
+askcline doctor
+```
+
+Set `ASKCLINE_JSON=true` for Cline NDJSON events. Set `ASKCLINE_AUTO_APPROVE=false` for approval-gated runs. Set `ASKCLINE_UNRESTRICTED=true` only when you intentionally want to bypass the wrapper's catastrophic-command deny policy.
+
+## Why the default changed
+
+The raw endpoint cannot inspect a repository, run a command, observe a failure, edit a file, or continue a tool loop. Cline CLI can. The default command therefore delegates authentication, sessions, tools, rules, hooks, context management, and execution to Cline instead of reimplementing those pieces in Bash.
+
+`raw` remains valuable for low-stakes transformations and clean shell pipelines. It is not the default because it is not agentic.
+
+## Safety boundary
+
+Autonomous execution is powerful. Use a clean branch and a workspace you are prepared to modify. The wrapper blocks a small set of catastrophic commands by default, but it does not sandbox the process or make generated changes correct. Review the diff before publishing.
+
+The wrapper never reads Cline's private token files. Agent runs let the official CLI manage its authentication. Raw API calls require an explicit `CLINE_API_KEY`. The static GitHub Pages site never accepts credentials.
+
+## Validation
+
+```bash
+npm test
+bash -n public/askcline
+```
+
+The deterministic suite covers:
+
+- the autonomous default dispatch;
+- full Cline CLI flags and finish-line task contract;
+- approval and JSON overrides;
+- interactive mode;
+- current and legacy raw API responses;
+- HTTP failures and nonzero exits;
+- clean stdout for raw pipelines;
+- absence of private-token scraping.
+
+GitHub Actions run the suite on Ubuntu and macOS and run ShellCheck on Linux.
+
+## Field report
+
+The root GitHub Pages site preserves the original three fictional-premise captures and the 60-second Remotion report. Those receipts demonstrate the explicit `askcline raw` path, not the new agentic default.
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000`.
-
-## Edit or render the film
+To edit or render the film:
 
 ```bash
 cd free-intelligence-film
@@ -81,8 +124,4 @@ npm run dev
 npx remotion render FreeIntelligenceReport out/free-intelligence-report.mp4
 ```
 
-The score is deterministic and can be regenerated with:
-
-```bash
-node scripts/generate-score.mjs public/newsroom-score.wav
-```
+Free describes the price. The harness determines the behavior. Validation determines whether the result is ready.
