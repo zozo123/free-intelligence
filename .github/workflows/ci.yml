@@ -31,7 +31,7 @@ jobs:
           shellcheck public/askcline
 
   render-film:
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/agent/') && !contains(github.event.head_commit.message, '[rendered film]') }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/agent/') && !contains(github.event.head_commit.message, '[rendered film]')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -80,6 +80,7 @@ jobs:
           awk "BEGIN { exit !(${duration} >= 69.9 && ${duration} <= 70.1) }"
 
       - name: Commit rendered media
+        if: ${{ github.event_name == 'push' }}
         run: |
           if git diff --quiet -- public/free-intelligence-report.mp4 public/film-poster.png public/og.png public/media-manifest.json; then
             echo "Rendered media is already current."
