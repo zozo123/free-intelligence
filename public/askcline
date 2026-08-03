@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.1.1"
 TIMEOUT="${CLINE_TIMEOUT:-0}"
 THINKING="${CLINE_THINKING:-high}"
 RETRIES="${CLINE_RETRIES:-5}"
 
 usage() {
   cat <<'USAGE'
-askcline 1.1.0 - every task runs through Cline's full agent harness
+askcline 1.1.1 - every task runs through Cline's full agent harness
 
 Usage:
   askcline <task...>               Complete a task autonomously in the current workspace
   askcline                         Open the interactive Cline agent in the current workspace
   askcline agent <task...>         Explicit alias for the default agent mode
   askcline plan <task...>          Investigate and plan without autonomous edits
-  askcline verify <question...>    Research with evidence and abstention requirements
-  askcline text <prompt...>        Harness-backed direct answer without repository edits
+  askcline verify <question...>    Read-only research with evidence and abstention requirements
+  askcline text <prompt...>        Read-only harness-backed direct answer
   askcline raw <prompt...>         Deprecated alias for `text`; still uses the harness
   askcline doctor                  Run the official Cline diagnostics
   askcline --version
@@ -47,7 +47,7 @@ apply_agent_guardrails() {
   local unrestricted="${ASKCLINE_UNRESTRICTED:-false}"
   validate_bool ASKCLINE_UNRESTRICTED "$unrestricted"
   if [ "$unrestricted" = false ] && [ -z "${CLINE_COMMAND_PERMISSIONS+x}" ]; then
-    export CLINE_COMMAND_PERMISSIONS='{"deny":["sudo *","rm -rf /","rm -rf /*","rm -rf ~*","git push --force*","git push -f *","git reset --hard*","git clean -fdx*"],"allowRedirects":true}'
+    export CLINE_COMMAND_PERMISSIONS='{"deny":["sudo *","rm -rf /","rm -rf /*","rm -rf ~*","git push --force*","git push --force-with-lease*","git push -f *","git reset --hard*","git clean -fdx*"],"allowRedirects":true}'
   fi
 }
 
@@ -115,11 +115,11 @@ verify_mode() {
   local json="${ASKCLINE_JSON:-false}"
   validate_bool ASKCLINE_JSON "$json"
   export CLINE_COMMAND_PERMISSIONS="${CLINE_COMMAND_PERMISSIONS:-{\"allow\":[\"git status\",\"git diff*\",\"git log*\",\"rg *\",\"find *\",\"cat *\"],\"deny\":[\"rm *\",\"sudo *\",\"git push*\",\"git reset*\",\"git clean*\"],\"allowRedirects\":false}}"
-  cline_args true "$json"
+  cline_args false "$json"
 
   local task
   task="$(cat <<EOF_TASK
-Operate in verification mode. Do not modify files.
+Operate in read-only verification mode. Do not modify files.
 
 For every material factual claim:
 1. Disambiguate the entity or event.
@@ -133,7 +133,7 @@ QUESTION:
 $*
 EOF_TASK
 )"
-  exec cline "${CLINE_ARGS[@]}" "$task"
+  exec cline "${CLINE_ARGS[@]}" --plan "$task"
 }
 
 text_mode() {
@@ -146,13 +146,13 @@ text_mode() {
 
   local task
   task="$(cat <<EOF_TASK
-Answer the user directly through the Cline harness. Do not modify repository files. Do not run commands unless they are necessary to answer accurately. Return the useful final answer without narrating internal steps.
+Answer the user directly through the Cline harness in read-only Plan mode. Do not modify repository files. Use tools only when needed for accuracy. Return the useful final answer without narrating internal steps.
 
 USER PROMPT:
 $*
 EOF_TASK
 )"
-  exec cline "${CLINE_ARGS[@]}" "$task"
+  exec cline "${CLINE_ARGS[@]}" --plan "$task"
 }
 
 doctor_mode() {
