@@ -22,3 +22,4 @@
 - The wrapper is free; provider and model charges may vary.
 - Keep `index.html`, `README.md`, the Remotion source, poster, OG card, and rendered film narratively consistent.
 - Rendered media must be generated from `free-intelligence-film/src/Composition.tsx`, validated in CI, and accompanied by `public/media-manifest.json`.
+- Do not require byte-identical lossy MP4 encodes. Verify stable movie properties and compare deterministic Remotion still checkpoints from the actual timeline byte-for-byte.
