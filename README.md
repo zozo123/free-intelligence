@@ -79,6 +79,7 @@ The GitHub Pages site is published from the repository root:
 - `public/free-intelligence-report.mp4`
 - `public/film-poster.png`
 - `public/og.png`
+- `public/checkpoints/*.png`
 - `public/media-manifest.json`
 
 Preview locally:
@@ -105,7 +106,7 @@ npm run lint
 npm run render:all
 ```
 
-The render pipeline strips nondeterministic MP4 metadata, fixes the source epoch, and produces the film, poster, and social card from one composition source. GitHub Actions verifies the exact movie duration, records SHA-256 hashes in `public/media-manifest.json`, and fails the pull request unless a clean rerender is byte-identical to the committed media.
+Lossy MP4 encoders may produce different container bytes for an equivalent render, so CI does not pretend that byte identity is a meaningful correctness guarantee. Instead, it strictly verifies the movie’s duration, codecs, dimensions, frame rate, and audio rate, and compares deterministic Remotion stills from four points on the actual film timeline byte-for-byte. Poster, social card, checkpoint hashes, and semantic movie properties are recorded in `public/media-manifest.json`.
 
 ## Validation
 
@@ -116,6 +117,6 @@ bash -n public/askcline
 cd free-intelligence-film && npm ci && npm run lint
 ```
 
-CI runs the root tests on Ubuntu and macOS, validates the Bash wrapper, runs ShellCheck on Linux, and renders the film on story branches.
+CI runs the root tests on Ubuntu and macOS, validates the Bash wrapper, runs ShellCheck on Linux, renders the complete film, and verifies its semantic and visual checkpoints before merge.
 
 Free is a price. Intelligence is a process. Evidence is the standard.
