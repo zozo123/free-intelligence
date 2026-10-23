@@ -74,6 +74,9 @@ code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 .hero h1 { font-size: clamp(68px, 7.7vw, 132px); }
 .hero h1 span, .section-heading h2 span, .film-copy h2 span, .install-heading h2 span { color: var(--red); }
 .hero-dek { font-family: Georgia, serif; font-size: clamp(31px, 2.8vw, 48px); font-style: italic; line-height: 1.08; margin: 38px 0 34px; max-width: 880px; }
+.hero-byline { font-size: 12px; font-weight: 900; letter-spacing: 2px; margin: 0 0 16px; text-transform: uppercase; }
+.hero-byline a { border-bottom: 2px solid var(--red); }
+.hero-answer { font-family: Georgia, serif; font-size: 18px; line-height: 1.45; margin: 0 0 34px; max-width: 680px; }
 .hero-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 20px; }
 .button { align-items: center; cursor: pointer; display: inline-flex; font-size: 11px; font-weight: 900; justify-content: center; letter-spacing: 2px; min-height: 54px; padding: 0 24px; text-transform: uppercase; }
 .button.primary { background: var(--red); color: white; }
@@ -84,17 +87,17 @@ code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 .hero-footnote { border-left: 5px solid var(--red); font-family: Georgia, serif; font-size: 16px; line-height: 1.35; margin: 34px 0 0; max-width: 760px; padding-left: 16px; }
 .hero-footnote strong { color: var(--red); font-size: 24px; }
 
-.hero-system { align-self: center; min-height: 690px; position: relative; }
+.hero-system { align-self: center; display: grid; gap: 48px; position: relative; }
 .system-card {
   background: var(--paper-bright);
   border: 3px solid var(--ink);
   box-shadow: 16px 18px 0 rgba(17,17,15,.15);
   padding: 28px 30px;
-  position: absolute;
+  position: relative;
   width: min(520px, 88%);
 }
-.system-card-old { left: 0; rotate: -3deg; top: 20px; }
-.system-card-new { bottom: 10px; right: 0; rotate: 2deg; }
+.system-card-old { justify-self: start; rotate: -3deg; }
+.system-card-new { justify-self: end; rotate: 2deg; }
 .system-kicker { border-bottom: 4px solid var(--ink); color: var(--red); font-size: 10px; font-weight: 900; letter-spacing: 3px; padding-bottom: 11px; }
 .system-card h2 { font-family: Georgia, serif; font-size: 68px; letter-spacing: -4px; line-height: .9; margin: 22px 0; }
 .mini-flow { align-items: center; display: flex; flex-wrap: wrap; gap: 9px; }
@@ -102,7 +105,7 @@ code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 .mini-flow b { color: var(--red); font-size: 24px; }
 .mini-flow-loop span { background: var(--red); }
 .system-card ul { font-family: Georgia, serif; font-size: 18px; line-height: 1.35; margin: 22px 0 0; padding-left: 22px; }
-.system-stamp { border: 6px solid var(--red); color: var(--red); font-size: 18px; font-weight: 900; letter-spacing: 2px; line-height: .88; padding: 10px 13px 8px; position: absolute; right: 18px; rotate: -8deg; text-align: center; top: 88px; }
+.system-stamp { background: var(--paper-bright); border: 5px solid var(--red); color: var(--red); font-size: 13px; font-weight: 900; letter-spacing: 2px; line-height: .95; padding: 8px 11px 6px; position: absolute; right: 18px; rotate: -6deg; text-align: center; top: -22px; }
 .system-card-new .system-stamp { rotate: 7deg; }
 
 .ticker { align-items: center; background: var(--red); color: white; display: flex; gap: 23px; min-height: 54px; overflow: hidden; padding: 0 4vw; white-space: nowrap; }
@@ -114,6 +117,7 @@ code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 .responsibility-section { margin: 0 auto; max-width: 1580px; padding: 120px 5vw; }
 .section-heading { margin-bottom: 58px; }
 .split-heading { display: grid; gap: 55px; grid-template-columns: minmax(0, 1fr) minmax(360px, .62fr); }
+.truth-card a, .footer-small a { text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .section-heading h2 { font-size: clamp(55px, 6vw, 95px); }
 .heading-copy { align-self: end; font-family: Georgia, serif; font-size: 21px; line-height: 1.35; margin: 0; }
 .heading-copy p { margin: 0 0 18px; }
@@ -213,14 +217,15 @@ code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 footer { align-items: end; background: var(--paper); display: grid; gap: 55px; grid-template-columns: 1.1fr .9fr; padding: 85px 5vw 55px; }
 .footer-mark { font-family: Georgia, serif; font-size: clamp(48px, 6vw, 98px); font-weight: 900; letter-spacing: -5px; line-height: .84; }
 footer > p { font-family: Georgia, serif; font-size: 20px; line-height: 1.4; margin: 0; }
-.footer-small { color: var(--muted); font-family: Arial, sans-serif; font-size: 10px; grid-column: 1 / -1; letter-spacing: 2px; padding-top: 30px; text-transform: uppercase; }
+.footer-small { color: var(--muted); font-family: Arial, sans-serif; font-size: 10px; grid-column: 1 / -1; letter-spacing: 2px; line-height: 1.6; padding-top: 30px; text-transform: uppercase; }
+.footer-small p { margin: 0 0 8px; }
+.footer-small a { color: var(--ink); }
 
 @media (max-width: 1180px) {
   .masthead { grid-template-columns: 1fr auto; }
   .nav-edition { display: none; }
-  .hero { grid-template-columns: 1fr; }
-  .hero-system { min-height: 620px; }
-  .split-heading { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .split-heading { grid-template-columns: minmax(0, 1fr); }
   .heading-copy { max-width: 850px; }
   .failure-grid { grid-template-columns: repeat(2, 1fr); }
   .responsibility-grid { grid-template-columns: repeat(2, 1fr); }
@@ -232,11 +237,12 @@ footer > p { font-family: Georgia, serif; font-size: 20px; line-height: 1.4; mar
 @media (max-width: 760px) {
   .masthead { align-items: start; grid-template-columns: 1fr; padding-bottom: 18px; padding-top: 18px; }
   .nav-links { gap: 15px; justify-content: flex-start; overflow-x: auto; }
-  .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 72px; }
-  .hero h1 { letter-spacing: -4px; }
-  .hero-system { min-height: auto; }
-  .system-card { margin: 0 0 24px; position: relative; width: 100%; }
-  .system-card-old, .system-card-new { bottom: auto; left: auto; right: auto; top: auto; }
+  .hero { grid-template-columns: minmax(0, 1fr); min-height: auto; padding-top: 72px; }
+  .hero h1 { font-size: clamp(48px, 16vw, 68px); letter-spacing: -4px; }
+  .hero-system { gap: 40px; }
+  .system-card { padding: 24px 22px; width: calc(100% - 20px); }
+  .system-card h2 { font-size: clamp(44px, 14vw, 68px); }
+  .section-heading h2, .install-heading h2, .film-copy h2, .truth-card h2 { font-size: clamp(32px, 9.2vw, 55px); letter-spacing: -2px; overflow-wrap: anywhere; }
   .receipt-tabs { grid-template-columns: 1fr; }
   .receipt-grid, .truth-section, .architecture-switch, footer { grid-template-columns: 1fr; }
   .receipt-grid { min-height: 0; }

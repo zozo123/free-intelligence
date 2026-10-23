@@ -3,15 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Free* Intelligence — the model was not the product</title>
-    <meta name="description" content="A field report about the difference between a fluent model answer and an accountable agent harness." />
+    <title>Free* Intelligence: the model was not the product — Yossi Eliaz</title>
+    <meta name="description" content="A field note and 70-second film by Yossi Eliaz on the difference between a fluent one-shot model answer and an accountable agent harness, plus askcline, a Bash wrapper for the Cline CLI." />
+    <meta name="author" content="Yossi Eliaz" />
     <link rel="canonical" href="https://zozo123.github.io/free-intelligence/" />
-    <meta property="og:title" content="Free* Intelligence — the model was not the product" />
-    <meta property="og:description" content="Models propose. Harnesses act. Evidence decides." />
-    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Free* Intelligence: the model was not the product" />
+    <meta property="og:description" content="A field note by Yossi Eliaz. Models propose. Harnesses act. Evidence decides." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://zozo123.github.io/free-intelligence/" />
     <meta property="og:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Free* Intelligence, Field Note 003 by Yossi Eliaz: the model was not the product." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Free* Intelligence: the model was not the product" />
+    <meta name="twitter:description" content="A field note by Yossi Eliaz. Models propose. Harnesses act. Evidence decides." />
+    <meta name="twitter:image" content="https://zozo123.github.io/free-intelligence/public/og.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Free* Intelligence: the model was not the product",
+        "description": "Three archived one-shot answers that invented history, why the failure was architectural, and askcline, a Bash wrapper for the Cline CLI.",
+        "url": "https://zozo123.github.io/free-intelligence/",
+        "image": "https://zozo123.github.io/free-intelligence/public/og.png",
+        "datePublished": "2026-08-02",
+        "dateModified": "2026-10-22",
+        "author": {
+          "@type": "Person",
+          "name": "Yossi Eliaz",
+          "url": "https://yossieliaz.netlify.app/",
+          "sameAs": ["https://github.com/zozo123", "https://www.linkedin.com/in/yossi-eliaz/"]
+        }
+      }
+    </script>
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
   </head>
@@ -35,6 +60,8 @@
           <p class="eyebrow">AN EXPERIMENT ABOUT THE DIFFERENCE BETWEEN ANSWERS AND WORK</p>
           <h1>THE MODEL<br />WAS NOT<br /><span>THE PRODUCT.</span></h1>
           <p class="hero-dek">A model can sound right. A harness has to show its work.</p>
+          <p class="hero-byline">By <a href="https://zozo123.github.io/">Yossi Eliaz</a> · August 2026</p>
+          <p class="hero-answer">Free* Intelligence is a field note and 70-second film. Three fictional prompts, archived on 2 August 2026, show a one-shot model inventing treaties, people, institutions, and quotations. The page argues the failure was architectural, not a matter of price. It also ships askcline, a Bash wrapper that runs tasks through the official Cline CLI. The receipts are historical demonstrations, not a benchmark.</p>
           <div class="hero-actions">
             <a class="button primary" href="#film">Watch the new field report</a>
             <a class="button text-button" href="#install">Install the harness <span aria-hidden="true">↘</span></a>
@@ -42,7 +69,7 @@
           <p class="hero-footnote"><strong>*</strong> “Free” described the original experiment. The wrapper is free; model and provider charges may vary.</p>
         </div>
 
-        <div class="hero-system" aria-label="Old answer path compared with the current harness path">
+        <div class="hero-system" role="group" aria-label="Old answer path compared with the current harness path">
           <article class="system-card system-card-old">
             <div class="system-kicker">THE OLD UNIT</div>
             <h2>ONE ANSWER</h2>
@@ -68,7 +95,7 @@
         </div>
       </section>
 
-      <div class="ticker" aria-label="Key thesis">
+      <div class="ticker" role="group" aria-label="Key thesis">
         <span>MODELS PROPOSE</span><i>◆</i><span>HARNESSES ACT</span><i>◆</i><span>EVIDENCE DECIDES</span><i>◆</i><span>HUMANS REMAIN ACCOUNTABLE</span>
       </div>
 
@@ -134,7 +161,7 @@
           <p class="heading-copy">Not from a weak model to a stronger model. From a single answer to a governed loop that can inspect, act, observe, retry, and report evidence.</p>
         </header>
 
-        <div class="architecture-switch" aria-label="Compare completion and harness architectures">
+        <div class="architecture-switch" role="group" aria-label="Compare completion and harness architectures">
           <div class="switch-buttons" role="tablist">
             <button type="button" role="tab" data-architecture="completion">ONE-SHOT COMPLETION</button>
             <button type="button" role="tab" data-architecture="harness">AGENT HARNESS</button>
@@ -208,7 +235,7 @@
           <h2>ONE CLINE HARNESS PATH</h2>
           <ul>
             <li>No direct model HTTP client</li>
-            <li>Agent tasks use the official Cline CLI</li>
+            <li>Agent tasks use the official <a href="https://github.com/cline/cline">Cline CLI</a></li>
             <li>Read-only modes use Plan mode</li>
             <li>CI verifies behavior and static claims</li>
           </ul>
@@ -230,7 +257,7 @@
           </ol>
           <aside class="install-aside">
             <p class="micro-label">PRICE TRUTH</p>
-            <p>The wrapper is free and open source. The model or provider selected in Cline may be free or paid.</p>
+            <p>The wrapper is free to download and its source is public. The model or provider selected in Cline may be free or paid.</p>
             <a class="button primary" href="./public/askcline" download>Download askcline</a>
           </aside>
         </div>
@@ -240,7 +267,10 @@
     <footer>
       <div class="footer-mark">MODELS PROPOSE.<br /><span>HARNESSES ACT.</span><br />EVIDENCE DECIDES.</div>
       <p>This is not a claim that harnesses eliminate hallucinations. It is a claim that consequential AI work needs observable actions, explicit controls, and reviewable evidence.</p>
-      <p class="footer-small">Free* Intelligence · Field Note 003 · Historical receipts preserved; current implementation verified in source and CI.</p>
+      <div class="footer-small">
+        <p>Free* Intelligence · Field Note 003 · By <a href="https://yossieliaz.netlify.app/">Yossi Eliaz</a> · <a href="https://zozo123.github.io/">More field notes and experiments</a> · <a href="https://github.com/zozo123/free-intelligence">Source</a></p>
+        <p>askcline is a thin wrapper around <a href="https://github.com/cline/cline">Cline</a>. Film rendered with <a href="https://www.remotion.dev/">Remotion</a>.</p>
+      </div>
     </footer>
   </body>
 </html>

@@ -1,5 +1,7 @@
 # Free* Intelligence
 
+A field note and 70-second film by [Yossi Eliaz](https://zozo123.github.io/) (August 2026) contrasting one-shot model answers with an agent harness, plus `askcline`, a Bash wrapper for the [Cline CLI](https://github.com/cline/cline). Live page: [zozo123.github.io/free-intelligence](https://zozo123.github.io/free-intelligence/).
+
 **The model was not the product. The loop is.**
 
 Free* Intelligence began as a one-shot experiment: fictional premises went in, polished history came out. The point was never that one particular model was uniquely bad. The point was that a prompt-to-answer architecture had no evidence contract, no observation loop, no permission boundary, and no proof of work.
@@ -14,7 +16,7 @@ CURRENT
 task -> context -> tools -> observations -> checks -> human review
 ```
 
-`askcline "task"` routes work through the official Cline CLI. Cline supplies authentication, sessions, workspace context, tools, permissions, and the agent loop. The wrapper adds a finish-line contract: inspect, implement, validate, retry, review, and report exactly what happened.
+`askcline "task"` routes work through the official [Cline CLI](https://github.com/cline/cline). Cline supplies authentication, sessions, workspace context, tools, permissions, and the agent loop. The wrapper adds a finish-line contract: inspect, implement, validate, retry, review, and report exactly what happened.
 
 ## The thesis
 
@@ -60,7 +62,7 @@ The default task path uses auto-approval and can edit files or run commands. The
 
 ## Price truth
 
-The wrapper is free and open source. The model or provider configured in Cline may be free or paid. “Free” describes the original experiment and the wrapper—not a universal per-run price guarantee.
+The wrapper is free to download and its source is public. The model or provider configured in Cline may be free or paid. “Free” describes the original experiment and the wrapper—not a universal per-run price guarantee.
 
 ## Historical receipts
 
@@ -90,7 +92,7 @@ python3 -m http.server 8000
 
 ## Film
 
-The 70-second Remotion film follows four beats:
+The 70-second film, built with [Remotion](https://www.remotion.dev/), follows four beats:
 
 1. the historical receipt;
 2. the architectural failure;

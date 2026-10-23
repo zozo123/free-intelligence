@@ -362,7 +362,14 @@ const Poster = ({compact = false}: {compact?: boolean}) => (
       <div style={{fontFamily: "Georgia, serif", fontSize: compact ? 31 : 43, fontStyle: "italic", marginTop: compact ? 26 : 36}}>A model can sound right. A harness has to show its work.</div>
     </div>
     <div style={{alignItems: "center", bottom: compact ? 42 : 62, display: "flex", justifyContent: "space-between", left: compact ? 48 : 68, position: "absolute", right: compact ? 48 : 68}}>
-      <div style={{fontSize: compact ? 16 : 22, fontWeight: 900, letterSpacing: 3}}>MODELS PROPOSE · HARNESSES ACT · EVIDENCE DECIDES</div>
+      <div>
+        {compact ? (
+          <div style={{fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 900, marginBottom: 16}}>
+            Yossi Eliaz <span style={{color: "#aaa59b", fontWeight: 400}}>· zozo123.github.io</span>
+          </div>
+        ) : null}
+        <div style={{fontSize: compact ? 16 : 22, fontWeight: 900, letterSpacing: 3}}>MODELS PROPOSE · HARNESSES ACT · EVIDENCE DECIDES</div>
+      </div>
       <Stamp rotate={-5} size={compact ? 20 : 27}>70 sec<br />field report</Stamp>
     </div>
   </AbsoluteFill>
